@@ -4,8 +4,8 @@ USE hirewrite;
 
 CREATE TABLE Users (
     user_id CHAR(36) PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE, 
-    mobile NUMBER(10) NOT NULL UNIQUE,-- have add the mobile no here 
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mobile VARCHAR(10) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     role ENUM('candidate','recruiter','admin') NOT NULL, -- student to candidate
     profile_photo_url VARCHAR(512),
