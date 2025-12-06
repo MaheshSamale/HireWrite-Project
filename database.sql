@@ -4,7 +4,8 @@ USE hirewrite;
 
 CREATE TABLE Users (
     user_id CHAR(36) PRIMARY KEY,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE, 
+    mobile NUMBER(10) NOT NULL UNIQUE,-- have add the mobile no here 
     password VARCHAR(255) NOT NULL,
     role ENUM('candidate','recruiter','admin') NOT NULL, -- student to candidate
     profile_photo_url VARCHAR(512),
@@ -57,7 +58,7 @@ CREATE TABLE OrgUsers (
 CREATE TABLE CandidateProfiles (
     candidate_id CHAR(36) PRIMARY KEY,
     user_id CHAR(36),
-    name VARCHAR(255),
+    name VARCHAR(255), 
     skills_json JSON,
     education_json JSON,
     experience_json JSON,
