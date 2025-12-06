@@ -6,7 +6,7 @@ CREATE TABLE Users (
     user_id CHAR(36) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('student','recruiter','admin') NOT NULL,
+    role ENUM('candidate','recruiter','admin') NOT NULL, -- student to candidate
     profile_photo_url VARCHAR(512),
     is_deleted BOOLEAN DEFAULT FALSE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -170,8 +170,6 @@ CREATE TABLE AdminAudit (
     col4 VARCHAR(255),
     FOREIGN KEY (actor_user_id) REFERENCES Users(user_id)
 );
-
-
 
 
 
