@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { registerUser } from "../services/user";
+import { registerCandidate } from "../services/candidate";
 import { toast } from "react-toastify";
 import Navbar from "../components/Navbar";
 
-function Register() {
+function CandidateRegister() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,7 +19,7 @@ function Register() {
     }
 
     setLoading(true);
-    const result = await registerUser(name, email, password, mobile);
+    const result = await registerCandidate(name, email, password, mobile);
     if (result.status === "success") {
       toast.success("Signup Successful");
       navigate("/login");
@@ -132,4 +132,4 @@ function Register() {
   );
 }
 
-export default Register;
+export default CandidateRegister;

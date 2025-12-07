@@ -6,11 +6,8 @@ const pool = require('../utils/db');
 const result = require('../utils/results');
 const config = require('../utils/config');
 
-const router = express.Router();
-
-<<<<<<< Rutuja_Jadhav
-=======
 const authorizeUser = require('../utils/authUser');  
+const router = express.Router();
 
 // CREATE/UPDATE Profile (uses req.headers.user_id)
 router.post('/profile', authorizeUser, (req, res) => {
@@ -225,4 +222,4 @@ router.get('/jobs/recommended', authorizeUser, (req, res) => {
 
 
 module.exports = router;  
->>>>>>> main
+

@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { UserContext } from "../App";
-import { loginUser } from "../services/user";
+import { loginCandidate } from "../services/candidate";
 import Navbar from "../components/Navbar";
 
-function Login() {
+function CandidateLogin() {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ function Login() {
 
     setLoading(true);
     try {
-      const result = await loginUser(email, password);
+      const result = await loginCandidate(email, password);
       if (result.status === "success") {
         sessionStorage.setItem("token", result.data.token);
         setUser({
@@ -50,7 +50,7 @@ function Login() {
             <div className="card shadow-lg border-0 rounded-4">
               <div className="card-body p-5">
                 <div className="mb-4 text-center">
-                  <h2 className="fw-bold text-dark mb-1">Login</h2>
+                  <h2 className="fw-bold text-dark mb-1">Log in as Job Seekers</h2>
                   <p className="text-muted">Sign in to your account</p>
                 </div>
 
@@ -103,4 +103,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default CandidateLogin;
