@@ -8,6 +8,8 @@ const config = require('../utils/config');
 
 const router = express.Router();
 
+<<<<<<< Rutuja_Jadhav
+=======
 const authorizeUser = require('../utils/authUser');  
 
 // CREATE/UPDATE Profile (uses req.headers.user_id)
@@ -223,3 +225,4 @@ router.get('/jobs/recommended', authorizeUser, (req, res) => {
 
 
 module.exports = router;  
+>>>>>>> main
