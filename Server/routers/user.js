@@ -8,6 +8,7 @@ const config = require('../utils/config');
 
 const router = express.Router();
 
+
 // REGISTER (Users + CandidateProfiles)
 router.post('/register', (req, res) => {
     const { name, email, mobile, password } = req.body;
