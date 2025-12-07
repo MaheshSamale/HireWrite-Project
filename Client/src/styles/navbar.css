@@ -1,0 +1,26 @@
+/* Open dropdown on hover (desktop) */
+@media (min-width: 992px) {
+  .dropdown-hover:hover > .dropdown-menu {
+    display: block;
+  }
+}
+
+/* Subtle card look like screenshot */
+.login-dropdown-menu {
+  min-width: 260px;
+  border-radius: 18px;
+  padding: 16px 12px;
+}
+
+/* little arrow effect */
+.login-dropdown-menu::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 32px;
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  transform: rotate(45deg);
+  box-shadow: -2px -2px 4px rgba(15, 23, 42, 0.06);
+}

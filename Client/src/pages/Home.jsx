@@ -1,12 +1,12 @@
 import { Outlet } from 'react-router'
+import Navbar from '../components/Navbar.jsx'
 
 function Home() {
 
     return (
         <div>
-            {/* <Navbar /> */}
+            <Navbar />
             <Outlet />
-            <h1>Home</h1>
         </div>
     )
 }
