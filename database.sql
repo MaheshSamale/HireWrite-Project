@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS hirewrite;
-CREATE DATABASE hirewrite;
-USE hirewrite;
+DROP DATABASE IF EXISTS hirewrite_database;
+CREATE DATABASE hirewrite_database;
+USE hirewrite_database;
 
 CREATE TABLE Users (
     user_id CHAR(36) PRIMARY KEY,

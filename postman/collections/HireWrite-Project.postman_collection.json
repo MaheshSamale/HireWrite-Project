@@ -1,0 +1,238 @@
+{
+  "info": {
+    "_postman_id": "07a6a710-ab0b-405e-837b-7525954849a8",
+    "name": "HireWrite-Project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49143323",
+    "_collection_link": "https://maheshsamale-5409590.postman.co/workspace/3f95f6d4-a211-4344-86d6-4066cb26547e/collection/49143323-07a6a710-ab0b-405e-837b-7525954849a8?action=share&source=collection_link&creator=49143323"
+  },
+  "item": [
+    {
+      "name": "Candidate",
+      "item": [
+        {
+          "name": "Register",
+          "id": "d01cc443-ae75-428a-b8ea-a87b889028bf",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Rutuja Jadhav\",\n    \"email\": \"rutuja@123\",\n    \"mobile\": 9876543210,\n    \"password\": \"rutuja\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/user/register",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "id": "807bbc73-8d8f-4d28-a886-7ac4af52cbb9",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{URL}}/api/user/login",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Profile",
+          "id": "1721cad5-9ac1-486a-8ce6-5ac0af742cb3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0IiwiaWF0IjoxNzY1MTA2OTM2fQ.cUp6PC5GXIzYPRVZ5p4W9oxoGnD89PXGb6ehE1gG0h8",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Rutuja Jadhav\",\n    \"skills_json\": [\"React\", \"Node.js\", \"MongoDB\", \"Express\"],\n    \"education_json\": [\n        {\n            \"degree\": \"BTech Computer Science\",\n            \"university\": \"Sunbeam Infotech Pune\",\n            \"year\": 2023\n        }\n    ],\n    \"experience_json\": [\n        {\n            \"company\": \"PhPd Hires\",\n            \"role\": \"Full-Stack Developer\",\n            \"duration\": \"2023 - Present\"\n        }\n    ],\n    \"links_json\": {\n        \"linkedin\": \"https://linkedin.com/in/rutuja-jadhav\",\n        \"github\": \"https://github.com/Rutuja_Jadhav\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/candidates/profile",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "id": "8806f0b1-fafa-4ca9-bd54-f04d5786b2a0",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0IiwiaWF0IjoxNzY1MTA2OTM2fQ.cUp6PC5GXIzYPRVZ5p4W9oxoGnD89PXGb6ehE1gG0h8",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Rutuja Jadhav\",\n    \"skills_json\": [\"React\", \"Node.js\", \"MongoDB\", \"Express\"],\n    \"education_json\": [\n        {\n            \"degree\": \"BTech Computer Science\",\n            \"university\": \"Sunbeam Infotech Pune\",\n            \"year\": 2023\n        }\n    ],\n    \"experience_json\": [\n        {\n            \"company\": \"PhPd Hires\",\n            \"role\": \"Full-Stack Developer\",\n            \"duration\": \"2023 - Present\"\n        }\n    ],\n    \"links_json\": {\n        \"linkedin\": \"https://linkedin.com/in/rutuja-jadhav\",\n        \"github\": \"https://github.com/Rutuja_Jadhav\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/candidates/me",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "0f544ed9-a18f-4d89-9010-32287beae336"
+    },
+    {
+      "name": "Organization",
+      "item": [
+        {
+          "name": "Register",
+          "id": "d66461d4-10ca-4ed4-916d-23cac3caa716",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0IiwiaWF0IjoxNzY1MTA2OTM2fQ.cUp6PC5GXIzYPRVZ5p4W9oxoGnD89PXGb6ehE1gG0h8",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"PhPd Hires\",\n    \"website\": \"https://phpd.in\",\n    \"description\": \"Leading IT Staffing Company in Pune\",\n    \"email\": \"admin@phpd.in\",\n    \"password\": \"phpd123\"\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/organizations/register",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "id": "be0abbf3-0651-45d5-aeb1-71d0db0d38c5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0IiwiaWF0IjoxNzY1MTA2OTM2fQ.cUp6PC5GXIzYPRVZ5p4W9oxoGnD89PXGb6ehE1gG0h8",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@phpd.in\",\n    \"password\": \"phpd123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/organizations/login",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "e006a051-41bb-43e7-9bc8-2e1242a62402"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "00541a0e-83f1-42cc-abb4-088eb06c68b3",
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "id": "dc61aff1-aab0-4fd4-af0a-960bb51eb799",
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "a8182ec5-6e3d-4d70-9a35-bbaccf160170",
+      "key": "URL",
+      "value": ""
+    }
+  ]
+}
