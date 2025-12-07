@@ -58,7 +58,7 @@ CREATE TABLE OrgUsers (
 CREATE TABLE CandidateProfiles (
     candidate_id CHAR(36) PRIMARY KEY,
     user_id CHAR(36),
-    name VARCHAR(255),
+    name VARCHAR(255), 
     skills_json JSON,
     education_json JSON,
     experience_json JSON,
