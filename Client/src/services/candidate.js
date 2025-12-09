@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import config from "./config";
 
-export async function loginUser(email, password) {
+export async function loginCandidate(email, password) {
     console.log(email);
     console.log(password);
     
@@ -16,7 +16,7 @@ export async function loginUser(email, password) {
     }
 }
 
-export async function registerUser(name, email, password, mobile) {
+export async function registerCandidate(name, email, password, mobile) {
     try {
          const url = config.BASE_URL + '/api/user/register'
         const body = { name, email, password, mobile }

@@ -2,10 +2,10 @@ import React, { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { UserContext } from "../App";
-import { loginUser } from "../services/user";
+import{loginOrganization} from"../services/organization";
 import Navbar from "../components/Navbar";
 
-function Login() {
+function OrganizationLogin() {
   const { setUser } = useContext(UserContext);
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ function Login() {
 
     setLoading(true);
     try {
-      const result = await loginUser(email, password);
+      const result = await loginOrganization(email, password);
       if (result.status === "success") {
         sessionStorage.setItem("token", result.data.token);
         setUser({
@@ -50,7 +50,7 @@ function Login() {
             <div className="card shadow-lg border-0 rounded-4">
               <div className="card-body p-5">
                 <div className="mb-4 text-center">
-                  <h2 className="fw-bold text-dark mb-1">Login</h2>
+                  <h2 className="fw-bold text-dark mb-1">Log in as Company</h2>
                   <p className="text-muted">Sign in to your account</p>
                 </div>
 
@@ -59,7 +59,7 @@ function Login() {
                   <input
                     type="email"
                     className="form-control form-control-lg rounded-3"
-                    placeholder="Enter your email"
+                    placeholder="Enter your company email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -70,7 +70,7 @@ function Login() {
                   <input
                     type="password"
                     className="form-control form-control-lg rounded-3"
-                    placeholder="Enter password"
+                    placeholder="Enter your company password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
@@ -87,7 +87,7 @@ function Login() {
                 <div className="text-center">
                   <span className="me-1">Don&apos;t have an account?</span>
                   <Link
-                    to="/register"
+                    to="/register-company"
                     className="text-decoration-none fw-semibold text-primary"
                   >
                     Create Account →
@@ -103,4 +103,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default OrganizationLogin;
