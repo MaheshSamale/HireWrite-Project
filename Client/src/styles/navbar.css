@@ -5,6 +5,10 @@
   }
 }
 
+.button-color{
+  color: #6B46C1;
+}
+
 /* Subtle card look like screenshot */
 .login-dropdown-menu {
   min-width: 260px;
