@@ -52,6 +52,7 @@ router.post('/register', (req, res) => {
 
 // LOGIN
 router.post('/login', (req, res) => {
+    console.log(req.body)
     const { email, password } = req.body;
     const sql = `SELECT u.user_id, u.email, u.mobile, u.password, u.role, cp.name 
                  FROM Users u LEFT JOIN CandidateProfiles cp ON u.user_id = cp.user_id 
