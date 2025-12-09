@@ -5,11 +5,14 @@ const { v4: uuidv4 } = require('uuid');
 const pool = require('../utils/db');
 const result = require('../utils/results');
 const config = require('../utils/config');
+const authorizeUser = require('../utils/authUser');
 
 const router = express.Router();
 
 // REGISTER ORGANIZATION (Inserts into Organizations table)
 router.post('/register', (req, res) => {
+    console.log(req.body);
+    
     const { name, website, description, email, password } = req.body;
     console.log("Organization register:", email);
     
@@ -61,6 +64,8 @@ router.post('/register', (req, res) => {
 
 // ORGANIZATION LOGIN
 router.post('/login', (req, res) => {
+    console.log(req.body);
+    
     const { email, password } = req.body;
     
     const sql = `SELECT organization_id, name, email, website, logo_url, password 
@@ -87,6 +92,90 @@ router.post('/login', (req, res) => {
                 logo_url: data[0].logo_url
             };
             res.send(result.createResult(null, orgData));
+        });
+    });
+});
+
+
+// ADD RECRUITER (Organization Admin only) - Creates Users + OrgUsers
+router.post('/recruiters', authorizeUser, (req, res) => {
+    console.log("rectruter called"); // Your debug log
+    
+    const organization_id = req.headers.organization_id;
+    console.log("Organization ID from token:", organization_id);
+    
+    // Safety check for req.body
+    if (!req.body) {
+        return res.send(result.createResult('Request body missing', null));
+    }
+    
+    const { email, mobile, name, position, org_role = 'recruiter' } = req.body;
+    console.log("Recruiter data:", { email, mobile, name, position });
+    
+    // Validation
+    if (!organization_id) {
+        return res.send(result.createResult('Organization token required', null));
+    }
+    if (!email || !mobile || !name || !position) {
+        return res.send(result.createResult('Email, mobile, name, and position required', null));
+    }
+    
+    const defaultPassword = 'Welcome123!';
+    
+    // 1. Check if user already exists
+    const checkUserSql = `SELECT user_id FROM Users WHERE email = ? OR mobile = ? AND is_deleted = FALSE`;
+    pool.query(checkUserSql, [email, mobile], (err, checkUsers) => {
+        if (err) return res.send(result.createResult(err, null));
+        if (checkUsers.length > 0) {
+            return res.send(result.createResult('Email or mobile already registered', null));
+        }
+
+        // 2. Hash default password
+        bcrypt.hash(defaultPassword, config.SALT_ROUND, (err, hashedPassword) => {
+            if (err || !hashedPassword) {
+                return res.send(result.createResult('Password hashing failed', null));
+            }
+
+            // 3. Create Users record (role='recruiter')
+            const user_id = uuidv4();
+            const userSql = `INSERT INTO Users (user_id, email, mobile, password, role, created_at) 
+                            VALUES (?, ?, ?, ?, 'recruiter', NOW())`;
+            
+            pool.query(userSql, [user_id, email, mobile, hashedPassword], (err, userData) => {
+                if (err) return res.send(result.createResult(err, null));
+
+                // 4. Create OrgUsers record
+                const recruiter_id = uuidv4();
+                const orgUserSql = `INSERT INTO OrgUsers (
+                    recruiter_id, user_id, organization_id, name, position, org_role, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, NOW())`;
+                
+                pool.query(orgUserSql, [
+                    recruiter_id, 
+                    user_id, 
+                    organization_id, 
+                    name, 
+                    position, 
+                    org_role
+                ], (err, orgUserData) => {
+                    if (err) return res.send(result.createResult(err, null));
+                    
+                    res.send(result.createResult(null, {
+                        success: true,
+                        recruiter_id,
+                        user_id,
+                        organization_id,
+                        name,
+                        position,
+                        org_role,
+                        login_credentials: {
+                            email,
+                            default_password: defaultPassword
+                        },
+                        message: 'Recruiter added successfully'
+                    }));
+                });
+            });
         });
     });
 });
