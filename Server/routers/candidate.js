@@ -111,7 +111,6 @@ router.post('/profile', authorizeUser, (req, res) => {
         return res.send(result.createResult('Name is required', null));
     }
 
-    // ✅ FIX: Convert to JSON strings (handles null/undefined too)
     const skills = skills_json ? JSON.stringify(skills_json) : null;
     const edu = education_json ? JSON.stringify(education_json) : null;
     const exp = experience_json ? JSON.stringify(experience_json) : null;
