@@ -111,7 +111,6 @@ router.post('/profile', authorizeUser, (req, res) => {
         return res.send(result.createResult('Name is required', null));
     }
 
-    // ✅ FIX: Convert to JSON strings (handles null/undefined too)
     const skills = skills_json ? JSON.stringify(skills_json) : null;
     const edu = education_json ? JSON.stringify(education_json) : null;
     const exp = experience_json ? JSON.stringify(experience_json) : null;
@@ -136,7 +135,7 @@ router.post('/profile', authorizeUser, (req, res) => {
                 res.send(result.createResult(null, { candidate_id, user_id, name, message: 'Profile created' }));
             });
         } else {
-            // UPDATE existing profile - ✅ FIXED SQL
+            // UPDATE existing profile - 
             const candidate_id = rows[0].candidate_id;
             const updateSql = `UPDATE CandidateProfiles SET 
                 name = ?, 
