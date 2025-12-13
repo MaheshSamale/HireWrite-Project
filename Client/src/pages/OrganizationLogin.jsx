@@ -25,9 +25,14 @@ function OrganizationLogin() {
       if (result.status === "success") {
         sessionStorage.setItem("token", result.data.token);
         setUser({
+          type: 'organization',
+          id: result.data.id,
+          name: result.data.name || result.data.organizationName,
           email: result.data.email,
-          password: result.data.password,
+          isOrganization: true,
+          token: result.data.token
         });
+        
         toast.success("Login Successful");
         navigate("/home");
       } else {
