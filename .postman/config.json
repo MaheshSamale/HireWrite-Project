@@ -1,0 +1,14 @@
+{
+  "workspace": {
+    "id": "3f95f6d4-a211-4344-86d6-4066cb26547e"
+  },
+  "entities": {
+    "collections": [
+      "../postman/collections/HireWrite-Project.postman_collection.json"
+    ],
+    "environments": [],
+    "specs": [],
+    "flows": [],
+    "globals": []
+  }
+}

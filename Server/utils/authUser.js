@@ -6,10 +6,11 @@ function authorizeUser(req, res, next) {
     const url = req.url;
     
     // Public routes (add candidates too)
-    if (url.includes('/api/user/register') || 
-        url.includes('/api/user/login') || 
+    if (url.includes('/api/candidates/register') || 
+        url.includes('/api/candidates/login') || 
         url.includes('/api/organizations/register') || 
-        url.includes('/api/organizations/login')) {
+        url.includes('/api/organizations/login') ||
+        url.includes('/api/organizations/recruiters/login') ) {
         console.log("Public route:", url);
         return next();
     }
