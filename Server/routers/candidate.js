@@ -135,7 +135,7 @@ router.post('/profile', authorizeUser, (req, res) => {
                 res.send(result.createResult(null, { candidate_id, user_id, name, message: 'Profile created' }));
             });
         } else {
-            // UPDATE existing profile - ✅ FIXED SQL
+            // UPDATE existing profile - 
             const candidate_id = rows[0].candidate_id;
             const updateSql = `UPDATE CandidateProfiles SET 
                 name = ?, 
