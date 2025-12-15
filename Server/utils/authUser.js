@@ -5,8 +5,12 @@ const config = require('../utils/config');
 function authorizeUser(req, res, next) {
     const url = req.url;
     
- 
-    if (url == '/api/user/register' || url == '/api/user/login' || url == '/api/organizations/login' || url == '/api/organizations/register') {
+    // Public routes (add candidates too)
+    if (url.includes('/api/candidates/register') || 
+        url.includes('/api/candidates/login') || 
+        url.includes('/api/organizations/register') || 
+        url.includes('/api/organizations/login') ||
+        url.includes('/api/organizations/recruiters/login') ) {
         console.log("Public route:", url);
         return next();
     }
@@ -19,9 +23,15 @@ function authorizeUser(req, res, next) {
             const payload = jwt.verify(token, config.SECRET);
             console.log("Payload:", payload);
             
-
-            req.headers.user_id = payload.user_id;
-            console.log("User ID set:", req.headers.user_id);
+            // Handle BOTH user_id AND organization_id tokens
+            if (payload.user_id) {
+                req.headers.user_id = payload.user_id;
+                console.log("User ID set:", req.headers.user_id);
+            }
+            if (payload.organization_id) {
+                req.headers.organization_id = payload.organization_id;
+                console.log("Organization ID set:", req.headers.organization_id);
+            }
             
             next();
         } catch (ex) {
