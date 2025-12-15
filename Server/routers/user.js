@@ -161,7 +161,5 @@ router.post('/profile-photo', authorizeUser, upload.single('photo'), (req, res) 
     });
 });
 
-module.exports = router;
-
-
+// Additional user-related routes can be added here
 module.exports = router;  
