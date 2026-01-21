@@ -93,11 +93,20 @@
             "header": [
               {
                 "key": "token",
-                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQ09NUEFOWSIsImNvbXBhbnlJZCI6NSwiaWF0IjoxNzY3MTQwNjQzfQ.YWI59c4Qf4ycOnWZ3YK3f0D7nR6KPVxN-pymRVH1rU8",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsImNvbXBhbnlJZCI6NSwicm9sZSI6IkNPTVBBTlkiLCJpYXQiOjE3Njg5OTgzODN9.aYWD05B5bYNrbhrzCf0t6SXzdV1jsutrMEJEKCVVRxU",
                 "type": "text",
                 "uuid": "b02420ca-3752-4ff3-b0ed-7b704279b19d"
               }
             ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rutuja Jadhav sss\",\n  \"email\": \"rutujasss@phpd.com\",\n  \"phone\": \"9986543234\",\n  \"employee_code\": \"EMP012\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Developer\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
             "url": {
               "raw": "{{URL}}/api/company/employees",
               "host": [
@@ -143,6 +152,34 @@
                 "api",
                 "company",
                 "assign-coupons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Request",
+          "id": "a5d78620-0d51-42c0-b6a1-ab878cb42cf1",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTYsImlhdCI6MTc2ODk4ODc2NX0.B1DgFIQgnclpyqyFee__PPh9UMchUt86Zp-MDVwYD8k",
+                "type": "text",
+                "uuid": "98ae3f46-9d98-44e7-b38d-ec6a7521cc93"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/company//my-profile",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "company",
+                "",
+                "my-profile"
               ]
             }
           },
