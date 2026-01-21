@@ -98,6 +98,7 @@ CREATE TABLE Jobs (
     job_id CHAR(36) PRIMARY KEY,
     org_id CHAR(36),
     title VARCHAR(255),
+    created_by_user_id CHAR(36), -- Id of Recruiter Who Has Posted This Job
     location_type ENUM('remote','hybrid','onsite') NOT NULL,
     employment_type ENUM('full-time','part-time','intern','contract') NOT NULL,
     experience_min INT,

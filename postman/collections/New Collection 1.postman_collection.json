@@ -1,0 +1,162 @@
+{
+  "info": {
+    "_postman_id": "58530405-358c-4783-955b-3a834d5d6bd2",
+    "name": "MiniProject",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "company",
+      "item": [
+        {
+          "name": "Register-company",
+          "id": "b020fcf6-f68c-4aec-b483-02618abac321",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login-Company",
+          "id": "d6fb83f8-b4ba-4bd7-8d21-3391ec97e3bd",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@techcorp.com\",\n  \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/auth/login",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Lunch Coupon",
+          "id": "ff3ee8da-c3af-49a3-b0a1-c37b3613324f",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQ09NUEFOWSIsImNvbXBhbnlJZCI6NSwiaWF0IjoxNzY3MTQwNjQzfQ.YWI59c4Qf4ycOnWZ3YK3f0D7nR6KPVxN-pymRVH1rU8",
+                "type": "text",
+                "uuid": "675e5595-5a9e-4552-81a7-a170a045101f"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/company/coupons",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "company",
+                "coupons"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Employee",
+          "id": "885009f0-f471-4a2a-8fe8-7cb2ae0f3db7",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQ09NUEFOWSIsImNvbXBhbnlJZCI6NSwiaWF0IjoxNzY3MTQwNjQzfQ.YWI59c4Qf4ycOnWZ3YK3f0D7nR6KPVxN-pymRVH1rU8",
+                "type": "text",
+                "uuid": "b02420ca-3752-4ff3-b0ed-7b704279b19d"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/company/employees",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "company",
+                "employees"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign 22 Coupons",
+          "id": "55e73a7d-7541-46eb-b89d-6d0e943982b6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjE2LCJyb2xlIjoiQ09NUEFOWSIsImNvbXBhbnlJZCI6NSwiaWF0IjoxNzY3MTQwNjQzfQ.YWI59c4Qf4ycOnWZ3YK3f0D7nR6KPVxN-pymRVH1rU8",
+                "type": "text",
+                "uuid": "b02420ca-3752-4ff3-b0ed-7b704279b19d"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n        \"employee_id\": 17,\n  \"coupon_master_id\": 1,\n  \"allocated\": 22\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/company/assign-coupons",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "company",
+                "assign-coupons"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "2b763b04-4ad9-4917-9df9-f551f8fac5b0"
+    }
+  ],
+  "variable": [
+    {
+      "id": "f0ade055-ddd2-4b57-9b36-a5edf7f0c80e",
+      "key": "URL",
+      "value": ""
+    }
+  ]
+}
