@@ -161,7 +161,7 @@ router.post('/profile-photo', authorizeUser, upload.single('photo'), (req, res) 
     });
 });
 
-module.exports = router;
+
 
 
 module.exports = router;  
