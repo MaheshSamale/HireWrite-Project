@@ -4,13 +4,13 @@ const config = require('../utils/config');
 
 function authorizeUser(req, res, next) {
     const url = req.url;
-    
+    console.log(url)
     // Public routes (add candidates too)
     if (url.includes('/api/candidates/register') || 
         url.includes('/api/candidates/login') || 
         url.includes('/api/organizations/register') || 
         url.includes('/api/organizations/login') ||
-        url.includes('/api/organizations/recruiters/login') ) {
+        url.includes('/api/organizations/recruiters/login')) {
         console.log("Public route:", url);
         return next();
     }
@@ -31,6 +31,9 @@ function authorizeUser(req, res, next) {
             if (payload.organization_id) {
                 req.headers.organization_id = payload.organization_id;
                 console.log("Organization ID set:", req.headers.organization_id);
+            }
+            if (payload.role) {
+                req.headers.role = payload.role;
             }
             
             next();
