@@ -1,0 +1,580 @@
+{
+  "info": {
+    "_postman_id": "338fa82e-b19a-4929-90ed-eaa8036463b6",
+    "name": "Food Coupon - FRESH Company Flow",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🚀 1. REGISTER NEW COMPANY",
+      "id": "38f75666-7e88-47a7-93f4-1176936a38c5",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"company_name\": \"FreshTech Corp\",\n  \"name\": \"Fresh Admin\",\n  \"email\": \"freshadmin@freshcorp.com\",\n  \"phone\": \"9876543219\",\n  \"password\": \"1234\",\n  \"address\": \"Pune, Maharashtra\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/register-company",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register-company"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 2. COMPANY LOGIN (Fresh Admin)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set(\"company_token\", pm.response.json().data.token);",
+              "}",
+              "pm.test(\"Company Login\", () => {",
+              "  pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "id": "83e59ecc-03f3-416d-8ad0-3b389a3ff71c"
+          }
+        }
+      ],
+      "id": "22f851f7-1ca3-438e-a441-ca0358769c97",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"freshadmin@freshcorp.com\",\n  \"password\": \"1234\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 3. CREATE COUPON (Lunch Coupon)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set(\"coupon_master_id\", pm.response.json().data.coupon_master_id);",
+              "}",
+              "pm.test(\"Coupon Created\", () => {",
+              "  pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "id": "c016568d-d182-40a8-b268-3ddac7f05653"
+          }
+        }
+      ],
+      "id": "fbc6df0b-3f1a-4d4e-bc6d-4fda2e054846",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{company_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"coupon_name\": \"Lunch Coupon\",\n  \"monthly_limit\": 22,\n  \"coupon_value\": 50.00\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/company/coupons",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "company",
+            "coupons"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 4. ADD EMPLOYEE (John)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "3423cd1b-33d1-4dd4-a752-7b34d713df2a",
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set(\"employee_id\", pm.response.json().data.employee_id);",
+              "}",
+              "pm.test(\"Employee Created\", () => {",
+              "  pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "id": "dd543c32-bcd5-477d-9db2-0877b6e8c0b8",
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "5f920da3-1941-4905-a2ad-ae3dea465b29",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{company_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@freshcorp.com\",\n  \"phone\": \"9876543211\",\n  \"employee_code\": \"EMP001\",\n  \"department\": \"Engineering\",\n  \"designation\": \"Developer\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/company/employees?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIwLCJyb2xlIjoiQ09NUEFOWSIsImNvbXBhbnlJZCI6NiwiaWF0IjoxNzY3MTQzMzIyfQ.yCrQjPuIKUJWVd1pOpzWb9m3RWtTrtnTsjowHH1YMWI",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "company",
+            "employees"
+          ],
+          "query": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIwLCJyb2xlIjoiQ09NUEFOWSIsImNvbXBhbnlJZCI6NiwiaWF0IjoxNzY3MTQzMzIyfQ.yCrQjPuIKUJWVd1pOpzWb9m3RWtTrtnTsjowHH1YMWI",
+              "type": "text",
+              "uuid": "8643e56a-4208-4536-be08-8879ccc4cdb6"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 5. ASSIGN 22 COUPONS",
+      "id": "a27edec6-c8d8-4fad-ad00-06f53d381d81",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{company_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"employee_id\": {{employee_id}},\n  \"coupon_master_id\": {{coupon_master_id}},\n  \"allocated\": 22\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/company/assign-coupons?=",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "company",
+            "assign-coupons"
+          ],
+          "query": [
+            {
+              "key": "",
+              "value": "",
+              "type": "text",
+              "uuid": "a1cbd0a8-69db-4653-a13a-28457a329e8d"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 6. EMPLOYEE PIN LOGIN",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set(\"employee_token\", pm.response.json().data.token);",
+              "}",
+              "pm.test(\"Employee Login\", () => {",
+              "  pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "id": "e693cbe0-c422-4a4b-819d-228e1e78eaee"
+          }
+        }
+      ],
+      "id": "14cf9010-e31a-43f0-9887-6378c63db0ab",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pin\": \"{{employee_pin}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/employee-login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "employee-login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 7. CHECK BALANCE (22 coupons)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Balance 22\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.status).to.eql('success');",
+              "  pm.expect(jsonData.data.remaining).to.eql(22);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "id": "b3c967f3-84bd-484d-ac44-cd0abf73dfc9"
+          }
+        }
+      ],
+      "id": "b940382b-0356-447d-97bc-e344c02c1f0e",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{employee_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/employee/balance",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "employee",
+            "balance"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 8. ADD VENDOR (Canteen A)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set(\"vendor_id\", pm.response.json().data.vendor_id);",
+              "  pm.collectionVariables.set(\"vendor_pin\", pm.response.json().data.pin);",
+              "}",
+              "pm.test(\"Vendor Created\", () => {",
+              "  pm.expect(pm.response.code).to.eql(200);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "id": "7637f7d6-b78c-4f34-baff-079d4ff533ae"
+          }
+        }
+      ],
+      "id": "4635876d-9bf1-4839-804d-b219cce5f9da",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{company_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"vendor_name\": \"Canteen A\",\n  \"phone\": \"9876543212\",\n  \"location\": \"Office Campus\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/company/vendors",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "company",
+            "vendors"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 9. VENDOR LOGIN",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "  pm.collectionVariables.set(\"vendor_token\", pm.response.json().data.token);",
+              "}"
+            ],
+            "type": "text/javascript",
+            "id": "10ed9708-05ab-434f-84c5-8c0480ab54bb"
+          }
+        }
+      ],
+      "id": "011394fd-56d5-48db-9a1f-7186f8bc30f4",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"pin\": \"{{vendor_pin}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/employee-login",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "employee-login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "✅ 10. VENDOR QR CODE",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"QR Generated\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.status).to.eql('success');",
+              "  pm.expect(jsonData.data.qr_url).to.exist;",
+              "});"
+            ],
+            "type": "text/javascript",
+            "id": "2550bdfd-cf37-4cf2-96db-c6d7afde1ef4"
+          }
+        }
+      ],
+      "id": "94fe17af-2c5f-4749-a712-c7aeeef5581e",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{vendor_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/vendor/qr",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "vendor",
+            "qr"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "🎉 11. EMPLOYEE REDEEM (21 left)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Redeem Success\", () => {",
+              "  const jsonData = pm.response.json();",
+              "  pm.expect(jsonData.status).to.eql('success');",
+              "  pm.expect(jsonData.data.remaining).to.be.below(22);",
+              "});"
+            ],
+            "type": "text/javascript",
+            "id": "6c16b85e-9e1d-4391-8b1d-fdecf3ea08ce"
+          }
+        }
+      ],
+      "id": "5855479a-cedb-48a2-aacb-77f431feaf9c",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{employee_token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"vendor_id\": {{vendor_id}},\n  \"coupon_master_id\": {{coupon_master_id}},\n  \"coupons_used\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/employee/redeem",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "employee",
+            "redeem"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "🏆 12. FINAL BALANCE CHECK (21)",
+      "id": "006a290f-7242-4c30-be26-5c999c5c3d15",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "token",
+            "value": "{{employee_token}}"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/api/employee/balance",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "employee",
+            "balance"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "id": "9e311ee3-de79-4410-b811-ed11ab94d27a",
+      "key": "base_url",
+      "value": "http://localhost:4001"
+    },
+    {
+      "id": "10cd424d-b44f-42e3-8da0-df3627c554c6",
+      "key": "company_token",
+      "value": ""
+    },
+    {
+      "id": "d07034eb-8763-485b-a593-91b352fefcda",
+      "key": "employee_token",
+      "value": ""
+    },
+    {
+      "id": "fd5faf76-36f9-4e4e-9322-39ede11170b3",
+      "key": "vendor_token",
+      "value": ""
+    },
+    {
+      "id": "2ca1e102-813c-4695-a0de-59821c54170a",
+      "key": "vendor_id",
+      "value": ""
+    },
+    {
+      "id": "db84bdf5-c8fa-4888-9e12-35f25f4e7519",
+      "key": "employee_id",
+      "value": ""
+    },
+    {
+      "id": "f310917d-e0f6-4032-b457-e424ccb265c7",
+      "key": "coupon_master_id",
+      "value": ""
+    }
+  ]
+}

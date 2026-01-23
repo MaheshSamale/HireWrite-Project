@@ -24,6 +24,7 @@ function CandidateLogin() {
       const result = await loginCandidate(email, password);
       if (result.status === "success") {
         sessionStorage.setItem("token", result.data.token);
+        sessionStorage.setItem("user",{ name : result.data.email})
         setUser({
           email: result.data.email,
           password: result.data.password,
