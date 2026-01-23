@@ -10,7 +10,9 @@ function authorizeUser(req, res, next) {
         url.includes('/api/candidates/login') || 
         url.includes('/api/organizations/register') || 
         url.includes('/api/organizations/login') ||
-        url.includes('/api/organizations/recruiters/login')) {
+        url.includes('/api/organizations/recruiters/login') ||
+        url.includes('/api/admin/register') ||
+        url.includes('/api/admin/login')) {
         console.log("Public route:", url);
         return next();
     }
@@ -34,6 +36,7 @@ function authorizeUser(req, res, next) {
             }
             if (payload.role) {
                 req.headers.role = payload.role;
+                console.log("Role set:", req.headers.role);
             }
             
             next();
