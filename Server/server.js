@@ -7,7 +7,9 @@ const userRouter = require("./routers/user");
 const orgRouter = require("./routers/organizations");
 const candidateRouter = require("./routers/candidate");
 const recruiterRouter = require('./routers/recruiter');
+const adminRouter = require('./routers/admin');
 const authorizeUser = require('./utils/authUser');
+
 
 
 const app = express()
@@ -27,6 +29,7 @@ app.use('/api/users',userRouter)
 app.use('/api/candidates',candidateRouter)
 app.use('/api/organizations',orgRouter)
 app.use('/api/recruiters', recruiterRouter);
+app.use('/api/admin', adminRouter);
 
 const port = 4000
 app.listen(port , 'localhost',()=>{
