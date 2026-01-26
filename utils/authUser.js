@@ -4,7 +4,7 @@ const config = require('../utils/config');
 
 function authorizeUser(req, res, next) {
     const url = req.url;
-    
+    console.log(url)
     // Public routes (add candidates too)
     if (url.includes('/api/candidates/register') || 
         url.includes('/api/candidates/login') || 
