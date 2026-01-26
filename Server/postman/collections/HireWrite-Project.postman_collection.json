@@ -1,0 +1,756 @@
+{
+  "info": {
+    "_postman_id": "07a6a710-ab0b-405e-837b-7525954849a8",
+    "name": "HireWrite-Project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Candidate",
+      "item": [
+        {
+          "name": "Register",
+          "id": "d01cc443-ae75-428a-b8ea-a87b889028bf",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Rutuja Jadhav\",\n    \"email\": \"rutuja@123\",\n    \"mobile\": 9876543210,\n    \"password\": \"rutuja\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/user/register",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "id": "807bbc73-8d8f-4d28-a886-7ac4af52cbb9",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n        \"email\": \"rutuja@123\",\n        \"password\": \"rutuja\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/user/login",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "user",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Profile",
+          "id": "1721cad5-9ac1-486a-8ce6-5ac0af742cb3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0IiwiaWF0IjoxNzY1MTA2OTM2fQ.cUp6PC5GXIzYPRVZ5p4W9oxoGnD89PXGb6ehE1gG0h8",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Rutuja Jadhav\",\n    \"skills_json\": [\"React\", \"Node.js\", \"MongoDB\", \"Express\"],\n    \"education_json\": [\n        {\n            \"degree\": \"BTech Computer Science\",\n            \"university\": \"Sunbeam Infotech Pune\",\n            \"year\": 2023\n        }\n    ],\n    \"experience_json\": [\n        {\n            \"company\": \"PhPd Hires\",\n            \"role\": \"Full-Stack Developer\",\n            \"duration\": \"2023 - Present\"\n        }\n    ],\n    \"links_json\": {\n        \"linkedin\": \"https://linkedin.com/in/rutuja-jadhav\",\n        \"github\": \"https://github.com/Rutuja_Jadhav\"\n    }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/candidates/profile",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile",
+          "id": "8806f0b1-fafa-4ca9-bd54-f04d5786b2a0",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0IiwiaWF0IjoxNzY1MTA2OTM2fQ.cUp6PC5GXIzYPRVZ5p4W9oxoGnD89PXGb6ehE1gG0h8",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Rutuja Jadhav\",\n    \"skills_json\": [\"React\", \"Node.js\", \"MongoDB\", \"Express\"],\n    \"education_json\": [\n        {\n            \"degree\": \"BTech Computer Science\",\n            \"university\": \"Sunbeam Infotech Pune\",\n            \"year\": 2023\n        }\n    ],\n    \"experience_json\": [\n        {\n            \"company\": \"PhPd Hires\",\n            \"role\": \"Full-Stack Developer\",\n            \"duration\": \"2023 - Present\"\n        }\n    ],\n    \"links_json\": {\n        \"linkedin\": \"https://linkedin.com/in/rutuja-jadhav\",\n        \"github\": \"https://github.com/Rutuja_Jadhav\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{URL}}/api/candidates/me",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get the Job By Id",
+          "id": "9e069975-f998-41c2-8e23-7c75f8ed9650",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTcxNDM4MH0.axE1ahGyH5ndJju8mL9jt6IwrEzcpNprayvUe7zrTzE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/candidates/jobs/618f18af-6753-4d45-9d7e-a0f56c848b5e",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "jobs",
+                "618f18af-6753-4d45-9d7e-a0f56c848b5e"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All the Recommended Jobs",
+          "id": "8e39596e-f84e-47db-ab17-07e687fca683",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTcxNDM4MH0.axE1ahGyH5ndJju8mL9jt6IwrEzcpNprayvUe7zrTzE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/candidates/recommended/jobs",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "recommended",
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Apply For Job",
+          "id": "40ff6e90-e1a4-489a-9771-5b44215f9f82",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTcxNDM4MH0.axE1ahGyH5ndJju8mL9jt6IwrEzcpNprayvUe7zrTzE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/candidates/applications",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Resume",
+          "id": "8d80ecc0-aec8-4917-9f55-ba0c43b602b6",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTcxNDM4MH0.axE1ahGyH5ndJju8mL9jt6IwrEzcpNprayvUe7zrTzE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resume",
+                  "type": "file",
+                  "uuid": "21f3a30c-b2c4-45fa-a2f3-620139803d1b",
+                  "src": [
+                    "/Users/maheshsamale/Downloads/Desktop Files/Mahesh_Samale.pdf"
+                  ]
+                },
+                {
+                  "key": "version_label",
+                  "value": "Main Resume",
+                  "type": "text",
+                  "uuid": "eaa46f9b-5429-4417-9a5f-b19d5a0642ad"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{URL}}/api/candidates/resumes",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "resumes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Resumes",
+          "id": "164f2926-3a74-40f2-9a7f-6695278e73ec",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTcxNDM4MH0.axE1ahGyH5ndJju8mL9jt6IwrEzcpNprayvUe7zrTzE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/candidates/resumes",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "resumes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gel All the Applications",
+          "id": "25ec9082-5065-47b9-875e-2726d53141cf",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTcxNDM4MH0.axE1ahGyH5ndJju8mL9jt6IwrEzcpNprayvUe7zrTzE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/candidates/applications",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All the Recommended Jobs Copy",
+          "id": "33b3a3c7-80ca-492d-8484-26f599060f63",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTcxNDM4MH0.axE1ahGyH5ndJju8mL9jt6IwrEzcpNprayvUe7zrTzE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/candidates/recommended/jobs",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "candidates",
+                "recommended",
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "0f544ed9-a18f-4d89-9010-32287beae336"
+    },
+    {
+      "name": "Organization",
+      "item": [
+        {
+          "name": "Register",
+          "id": "d66461d4-10ca-4ed4-916d-23cac3caa716",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0IiwiaWF0IjoxNzY1MTA2OTM2fQ.cUp6PC5GXIzYPRVZ5p4W9oxoGnD89PXGb6ehE1gG0h8",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"PhPd Hires\",\n    \"website\": \"https://phpd.in\",\n    \"description\": \"Leading IT Staffing Company in Pune\",\n    \"email\": \"admin@phpd.in\",\n    \"password\": \"phpd123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/organizations/register",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Recruiter",
+          "id": "c88394a4-533e-4228-a584-bfd45af4fdf0",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb25faWQiOiI4NWZiZWY2OS1kNzdiLTQ0ZWQtODY5Yy03OThlMzIxYzZjMmYiLCJpYXQiOjE3NjUyMTkyMjV9.JOyxTFCiC-vz4YGIHD-JazYPPveuP5RjqZ5yeg8f38g",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"recruiter1@phpd.in\",\n    \"mobile\": 9876543211,\n    \"name\": \"Mahesh Samale\",\n    \"position\": \"Senior Recruiter\",\n    \"org_role\": \"recruiter\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/organizations/recruiters",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "recruiters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "id": "618b4c09-4adb-422a-b314-6f772a7d0ba1",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n        \"email\": \"admin@phpd.in\",\n    \"password\": \"phpd123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/organizations/login",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Recruiter Login",
+          "id": "3698cac6-efce-4ae3-8084-40996a43741b",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"recruiter1@phpd.in\",\n    \"password\": \"Welcome123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/organizations/recruiters/login",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "recruiters",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Recruiters of Organization",
+          "id": "6c578d65-9e22-4c23-ab1a-644203494981",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb25faWQiOiI4NWZiZWY2OS1kNzdiLTQ0ZWQtODY5Yy03OThlMzIxYzZjMmYiLCJpYXQiOjE3NjU2MzU1NTB9.BcfH84mHDRN1tKszXzdE1avfQF3Zqa2nuERPVdlCKZ0",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/organizations/recruiters",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "recruiters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Recruiter By Id",
+          "id": "593d852a-b9e8-4292-b879-e8e94217cd59",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb25faWQiOiI4NWZiZWY2OS1kNzdiLTQ0ZWQtODY5Yy03OThlMzIxYzZjMmYiLCJpYXQiOjE3NjU2MzU1NTB9.BcfH84mHDRN1tKszXzdE1avfQF3Zqa2nuERPVdlCKZ0",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/organizations/recruiters/7c3d1d4e-5a12-4b3f-b2b6-2fe23e9b9f01",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "recruiters",
+                "7c3d1d4e-5a12-4b3f-b2b6-2fe23e9b9f01"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Jobs Posted by Organization (All Recruiters)",
+          "id": "86653a82-d28b-4daa-942a-284de55c12b9",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb25faWQiOiI4NWZiZWY2OS1kNzdiLTQ0ZWQtODY5Yy03OThlMzIxYzZjMmYiLCJpYXQiOjE3NjU2MzU1NTB9.BcfH84mHDRN1tKszXzdE1avfQF3Zqa2nuERPVdlCKZ0",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/organizations/recruiters",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "recruiters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Jobs Posted by Recruiter Id In Organization",
+          "id": "cd0cb330-70d4-47c8-a72e-3c052477481e",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJvcmdhbml6YXRpb25faWQiOiI4NWZiZWY2OS1kNzdiLTQ0ZWQtODY5Yy03OThlMzIxYzZjMmYiLCJpYXQiOjE3NjU2MzU1NTB9.BcfH84mHDRN1tKszXzdE1avfQF3Zqa2nuERPVdlCKZ0",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/organizations/recruiters",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "organizations",
+                "recruiters"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "e006a051-41bb-43e7-9bc8-2e1242a62402"
+    },
+    {
+      "name": "User APIs (Candidate + Recruiter)",
+      "item": [
+        {
+          "name": "Add/Update User Profile Photo",
+          "id": "40d9249d-c359-4d6b-84d1-54b8d7459319",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiOWFiMWVjOGEtYmFmMi00NDdhLWFkYTYtZjUwZjhhNjgxYzA0Iiwicm9sZSI6ImNhbmRpZGF0ZSIsImlhdCI6MTc2NTYxOTA1NX0.u5Vc3ZPi_rkEY_uk2N9G1WMiXt99BtXcJ8ayOYLf_5I",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/users/profile-photo",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "profile-photo"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "3a4e6419-4da8-4f81-b256-6ee375174d34"
+    },
+    {
+      "name": "Recruiters",
+      "item": [
+        {
+          "name": "Post a Job By Recruiter",
+          "id": "a329000f-db2b-4202-b8e7-f932195e50a3",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTFjYzI4MTAtNjIzMC00MmVhLTk4YmYtZDA4NGJlODkwODYwIiwicm9sZSI6InJlY3J1aXRlciIsImlhdCI6MTc2NTY4NDYzNn0.a9ydMrJPYLRlmztJECrlup6tyiHdkitcoJiLA0JWxWE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Full Stack Developer\",\n  \"location_type\": \"remote\",        // 'remote' | 'hybrid' | 'onsite'\n  \"employment_type\": \"full-time\",   // 'full-time' | 'part-time' | 'intern' | 'contract'\n  \"experience_min\": 2,\n  \"experience_max\": 5,\n  \"skills_required_json\": [\"React\", \"Node.js\", \"MySQL\"],\n  \"skills_preferred_json\": [\"Docker\", \"AWS\"],\n  \"jd_text\": \"We are looking for a MERN stack developer...\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/recruiters/jobs",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "recruiters",
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Jobs of Recruiter",
+          "id": "3fc9fbd0-a205-4a3b-9155-65439f505c7d",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTFjYzI4MTAtNjIzMC00MmVhLTk4YmYtZDA4NGJlODkwODYwIiwicm9sZSI6InJlY3J1aXRlciIsImlhdCI6MTc2NTY4NDYzNn0.a9ydMrJPYLRlmztJECrlup6tyiHdkitcoJiLA0JWxWE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/recruiters/jobs",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "recruiters",
+                "jobs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Applications for a Job",
+          "id": "edb6ce40-326b-48a0-b830-b3037278a326",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTFjYzI4MTAtNjIzMC00MmVhLTk4YmYtZDA4NGJlODkwODYwIiwicm9sZSI6InJlY3J1aXRlciIsImlhdCI6MTc2NTY4NDYzNn0.a9ydMrJPYLRlmztJECrlup6tyiHdkitcoJiLA0JWxWE",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{URL}}/api/recruiters/jobs/618f18af-6753-4d45-9d7e-a0f56c848b5e/applications",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "recruiters",
+                "jobs",
+                "618f18af-6753-4d45-9d7e-a0f56c848b5e",
+                "applications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Application Stage",
+          "id": "c17f9f93-3dc1-4c54-bd93-245440bb49a9",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "token",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTFjYzI4MTAtNjIzMC00MmVhLTk4YmYtZDA4NGJlODkwODYwIiwicm9sZSI6InJlY3J1aXRlciIsImlhdCI6MTc2NTY4NDYzNn0.a9ydMrJPYLRlmztJECrlup6tyiHdkitcoJiLA0JWxWE",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stage\": \"shortlisted\",\n  \"decision\": null\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{URL}}/api/recruiters/applications/0e7443e7-bce1-4702-b534-45cea227bfb2/stage",
+              "host": [
+                "{{URL}}"
+              ],
+              "path": [
+                "api",
+                "recruiters",
+                "applications",
+                "0e7443e7-bce1-4702-b534-45cea227bfb2",
+                "stage"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a046ffb9-7067-45fd-8368-838c5c34b47f"
+    }
+  ],
+  "variable": [
+    {
+      "id": "6afad869-9b8c-4962-b63c-663af47cb540",
+      "key": "URL",
+      "value": ""
+    }
+  ]
+}
