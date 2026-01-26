@@ -2,9 +2,12 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+// Add this import at top
 const pool = require('../utils/db');
 const result = require('../utils/results');
 const config = require('../utils/config');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require("@google/genai");
 
 const multer = require('multer');
 const fs = require('fs');
@@ -12,6 +15,9 @@ const path = require('path');
 
 const authorizeUser = require('../utils/authUser');  
 const router = express.Router();
+
+
+
 
 
 
@@ -47,6 +53,119 @@ const resumeUpload = multer({
         cb(null, true);
     }
 });
+
+
+
+
+// 🔥 PURE GEMINI + AUTO-SAVE to JobFitmentScores
+router.post('/jobs/:jobId/gemini-score', authorizeUser, async (req, res) => {
+    console.log('🌟 === PURE GEMINI + SAVE TO DB START ===');
+    
+    try {
+      const userId = req.headers.user_id;
+      const { jobId } = req.params;
+      
+      console.log('👤 User:', userId, 'Job:', jobId);
+      
+      // 1. Get candidate skills
+      const [candidateRows] = await pool.promise().query(`
+        SELECT skills_json, experience_json
+        FROM CandidateProfiles 
+        WHERE user_id = ? AND is_deleted = 0
+      `, [userId]);
+      
+      if (!candidateRows[0]) {
+        return res.status(404).json({ error: 'Candidate not found' });
+      }
+      
+      // 2. Get job details
+      const [jobs] = await pool.promise().query(`
+        SELECT title, jd_text, skills_required_json
+        FROM Jobs WHERE job_id = ? AND status = 'open'
+      `, [jobId]);
+      
+      if (!jobs[0]) {
+        return res.status(404).json({ error: 'Job not found' });
+      }
+      
+      const job = jobs[0];
+      console.log('💼 Job:', job.title);
+      console.log('🎯 Skills:', candidateRows[0].skills_json);
+      
+      // 3. PURE GEMINI CALL
+      console.log('🤖 Calling Gemini 2.5 Flash...');
+      const genAI = new GoogleGenerativeAI('AIzaSyCQ0U1Ysp_rUDmicOD_Q6nYeVlZclLh95U');
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      
+      const prompt = `Score candidate fit (0-100) for this job:
+  
+  JOB: ${job.title}
+  JD: ${job.jd_text?.substring(0, 1500)}
+  REQUIRED: ${JSON.stringify(job.skills_required_json || {})}
+  
+  CANDIDATE SKILLS: ${JSON.stringify(candidateRows[0].skills_json || [])}
+  
+  Return ONLY this format:
+  Score: [NUMBER]
+  Explanation: [TEXT]`;
+  
+      console.log('📤 Prompt sent');
+      const result = await model.generateContent(prompt);
+      const text = await result.response.text();
+      
+      console.log('📥 Gemini:', text);
+      
+      // 4. Parse response
+      const scoreMatch = text.match(/Score:\s*(\d+)/i);
+      const explanationMatch = text.match(/Explanation:\s*(.+)/is);
+      
+      const score = Math.min(100, Math.max(0, parseInt(scoreMatch?.[1]) || 50));
+      const explanation = explanationMatch?.[1]?.trim() || 'AI analysis complete';
+      
+      console.log('✅ Score:', score, 'Explanation:', explanation);
+      
+      // 🔥 5. SAVE TO JobFitmentScores IMMEDIATELY
+      console.log('💾 SAVING TO JobFitmentScores...');
+      const scoreId = uuidv4();
+      
+      await pool.promise().query(`
+        INSERT INTO JobFitmentScores (id, user_id, job_id, keyword_score, semantic_score, fit_flag, explanation)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `, [
+        scoreId, 
+        userId, 
+        jobId,
+        score,        // keyword_score
+        score,        // semantic_score  
+        score > 60 ? 1 : 0,  // fit_flag
+        explanation.substring(0, 500)  // Limit text length
+      ]);
+      
+      console.log('✅ SAVED TO DATABASE! ID:', scoreId);
+      
+      // 6. Response
+      const response = {
+        fitmentScore: score / 100,
+        keywordMatch: score,
+        explanation,
+        aiPowered: true,
+        rawGemini: text,
+        savedToDb: true,
+        scoreId
+      };
+      
+      console.log('📤 Response:', response);
+      console.log('🌟 === GEMINI + DB SUCCESS ===');
+      
+      res.json(response);
+      
+    } catch (error) {
+      console.error('💥 GEMINI ERROR:', error.message);
+      res.status(500).json({ error: 'Gemini failed', details: error.message });
+    }
+  });
+  
+
 
 // POST /api/candidates/resumes (upload resume)
 router.post('/resumes', authorizeUser, resumeUpload.single('resume'), (req, res) => {
@@ -537,6 +656,7 @@ router.post('/applications', authorizeUser, (req, res) => {
 });
 
 
+
 // GET /api/candidates/applications
 router.get('/applications', authorizeUser, (req, res) => {
     const user_id = req.headers.user_id;
@@ -545,32 +665,239 @@ router.get('/applications', authorizeUser, (req, res) => {
 
     const sql = `
         SELECT 
+            -- Application core
             a.application_id,
             a.job_id,
             a.resume_id,
             a.stage,
             a.decision,
             a.created_at,
+            
+            -- Job details
             j.title,
             j.location_type,
             j.employment_type,
+            j.experience_min,
+            j.experience_max,
             j.status AS job_status,
+            
+            -- Organization
             o.name AS organization_name,
-            o.logo_url
+            o.logo_url,
+            o.website,
+            
+            -- ✅ RESUME DETAILS (your main request)
+            r.storage_path AS resume_url,
+            -- ❌ Removed r.filename (doesn't exist)
+            r.version_label,
+            r.source,
+            r.active AS resume_active,
+            
+            -- ✅ CANDIDATE PROFILE
+            cp.name AS candidate_name,
+            cp.skills_json,
+            
+            -- ✅ JOB FITMENT SCORES (your actual table)
+            jfs.keyword_score,
+            jfs.semantic_score,
+            jfs.fit_flag,
+            jfs.explanation AS ai_explanation
         FROM Applications a
         JOIN Jobs j ON a.job_id = j.job_id
         JOIN Organizations o ON j.org_id = o.organization_id
+        LEFT JOIN Resumes r ON a.resume_id = r.resume_id 
+            AND r.user_id = ? AND r.is_deleted = FALSE
+        LEFT JOIN CandidateProfiles cp ON a.user_id = cp.user_id 
+            AND cp.is_deleted = FALSE
+        LEFT JOIN JobFitmentScores jfs ON a.user_id = jfs.user_id 
+            AND a.job_id = jfs.job_id 
+            AND jfs.is_deleted = FALSE
         WHERE a.user_id = ?
           AND a.is_deleted = FALSE
+          AND j.status = 'open'
+          AND o.is_deleted = FALSE
         ORDER BY a.created_at DESC
     `;
 
-    pool.query(sql, [user_id], (err, rows) => {
-        if (err) return res.send(result.createResult(err, null));
+    pool.query(sql, [user_id, user_id], (err, rows) => {
+        if (err) {
+            console.error('Applications query error:', err);
+            return res.send(result.createResult(err, null));
+        }
+        
+        console.log(`✅ Found ${rows.length} applications with JobFitmentScores`);
         res.send(result.createResult(null, rows));
     });
 });
 
+
+
+// GET /api/candidates/applications/:applicationId/resume
+router.get('/applications/:applicationId/resume', authorizeUser, (req, res) => {
+    const user_id = req.headers.user_id;  // ✅ Already set by your authorizeUser middleware
+    const { applicationId } = req.params;
+
+    console.log('Get Resume by Application: user_id =', user_id, 'applicationId =', applicationId);
+
+    if (!applicationId) {
+        return res.send(result.createResult('applicationId is required', null));
+    }
+
+    // 1) Verify application belongs to this user and get resume_id
+    const appSql = `
+        SELECT 
+            a.application_id,
+            a.job_id,
+            a.resume_id,
+            a.stage,
+            a.created_at
+        FROM Applications a
+        WHERE a.application_id = ? 
+          AND a.user_id = ? 
+          AND a.is_deleted = FALSE
+    `;
+
+    pool.query(appSql, [applicationId, user_id], (errApp, appRows) => {
+        if (errApp) {
+            console.error('Application query error:', errApp);
+            return res.send(result.createResult(errApp, null));
+        }
+        
+        if (appRows.length === 0) {
+            return res.send(result.createResult('Application not found or you do not have access', null));
+        }
+
+        const resume_id = appRows[0].resume_id;
+
+        // 2) Get resume details using the resume_id from application
+        const resumeSql = `
+            SELECT 
+                resume_id,
+                user_id,
+                storage_path,
+                filename,
+                parsed_json,
+                source,
+                version_label,
+                active,
+                created_at
+            FROM Resumes
+            WHERE resume_id = ? 
+              AND user_id = ? 
+              AND is_deleted = FALSE
+        `;
+
+        pool.query(resumeSql, [resume_id, user_id], (errResume, resumeRows) => {
+            if (errResume) {
+                console.error('Resume query error:', errResume);
+                return res.send(result.createResult(errResume, null));
+            }
+            
+            if (resumeRows.length === 0) {
+                return res.send(result.createResult('Resume not found for this application', null));
+            }
+
+            const resume = resumeRows[0];
+            
+            // ✅ Combined response with application + resume context
+            const responseData = {
+                application: {
+                    application_id: appRows[0].application_id,
+                    job_id: appRows[0].job_id,
+                    stage: appRows[0].stage,
+                    created_at: appRows[0].created_at
+                },
+                resume: {
+                    resume_id: resume.resume_id,
+                    storage_path: resume.storage_path,
+                    filename: resume.filename || path.basename(resume.storage_path),
+                    version_label: resume.version_label,
+                    source: resume.source,
+                    active: resume.active,
+                    parsed_json: resume.parsed_json, // For AI-parsed resume data
+                    created_at: resume.created_at
+                },
+                message: 'Resume details retrieved successfully'
+            };
+
+            console.log('✅ Resume served for application:', applicationId);
+            res.send(result.createResult(null, responseData));
+        });
+    });
+});
+
+// GET /api/candidates/fitment/:jobId - Get fitment by job_id + user_id
+router.get('/fitment/:jobId', authorizeUser, (req, res) => {
+    const user_id = req.headers.user_id;  // ✅ From your token middleware
+    const { jobId } = req.params;
+    
+    console.log('🔍 === SINGLE FITMENT BY JOB ===', { user_id, jobId });
+    
+    const sql = `
+        SELECT 
+            -- Fitment scores (LATEST)
+            jfs.id, jfs.keyword_score, jfs.semantic_score, jfs.fit_flag, 
+            jfs.explanation, jfs.created_at,
+            
+            -- Job details
+            j.title, j.jd_text, j.location_type, j.employment_type,
+            j.experience_min, j.experience_max, j.skills_required_json,
+            
+            -- Organization
+            o.name as organization_name, o.logo_url, o.website,
+            
+            -- Candidate profile
+            cp.name as candidate_name, cp.skills_json
+            
+        FROM JobFitmentScores jfs
+        JOIN Jobs j ON jfs.job_id = j.job_id AND j.status = 'open' AND j.is_deleted = 0
+        JOIN Organizations o ON j.org_id = o.organization_id AND o.is_deleted = 0
+        JOIN CandidateProfiles cp ON jfs.user_id = cp.user_id AND cp.is_deleted = 0
+        
+        WHERE jfs.user_id = ? AND jfs.job_id = ? AND jfs.is_deleted = 0
+        ORDER BY jfs.created_at DESC 
+        LIMIT 1
+    `;
+    
+    pool.query(sql, [user_id, jobId], (err, rows) => {
+        if (err) {
+            console.error('💥 Fitment query error:', err);
+            return res.send(result.createResult(err, null));
+        }
+        
+        if (rows.length === 0) {
+            console.log('❌ No fitment score found');
+            return res.send(result.createResult('No fitment score found for this job', null));
+        }
+        
+        const fitment = rows[0];
+        console.log('✅ Fitment found:', fitment.semantic_score, '%');
+        
+        res.send(result.createResult(null, {
+            fitmentScore: fitment.semantic_score / 100,
+            keywordScore: fitment.keyword_score,
+            fitFlag: fitment.fit_flag,
+            explanation: fitment.explanation,
+            scoreId: fitment.id,
+            createdAt: fitment.created_at,
+            
+            // Full job details
+            job: {
+                job_id: fitment.job_id,
+                title: fitment.title,
+                organization_name: fitment.organization_name,
+                location_type: fitment.location_type,
+                employment_type: fitment.employment_type,
+                experience_min: fitment.experience_min,
+                experience_max: fitment.experience_max,
+                skills_required: fitment.skills_required_json
+            },
+            
+            // Candidate skills
+            candidateSkills: fitment.skills_json
+        }));
+    });
+});
 
 
 module.exports = router;  
