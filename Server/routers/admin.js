@@ -40,11 +40,9 @@ router.post('/register', (req, res) => {
     });
 });
 
-/*
- * ADMIN LOGIN
- * POST /api/admin/login
- * Body: { email, password }
- */
+ //POST /api/admin/login
+
+
 router.post('/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -90,11 +88,9 @@ router.post('/login', (req, res) => {
 
 
 
-/*
- * ADMIN DASHBOARD COUNTS
- * GET /api/admin/dashboard
- * Headers: { token: <admin_jwt> }
- */
+
+ // GET /api/admin/dashboard 
+
 router.get('/dashboard', authorizeUser, (req, res) => {
     const role = req.headers.role;
     if (role !== 'admin') {
@@ -126,16 +122,14 @@ router.get('/dashboard', authorizeUser, (req, res) => {
 
 /*
  * ADMIN – LIST USERS
- * GET /api/admin/users?user_role=candidate|recruiter|admin (optional)
+ * GET /api/admin/users
  */
 router.get('/users', authorizeUser, (req, res) => {
     const role = req.headers.role;
     if (role !== 'admin') {
         return res.send(result.createResult('Access denied: admin only', null));
     }
-
     const { user_role } = req.query;
-
     let sql = `
         SELECT user_id, email, mobile, role, is_deleted, created_at
         FROM Users
@@ -160,6 +154,7 @@ router.get('/users', authorizeUser, (req, res) => {
  * ADMIN – LIST ORGANIZATIONS
  * GET /api/admin/organizations
  */
+
 router.get('/organizations', authorizeUser, (req, res) => {
     const role = req.headers.role;
     if (role !== 'admin') {
@@ -182,7 +177,7 @@ router.get('/organizations', authorizeUser, (req, res) => {
 
 /*
  * ADMIN – LIST JOBS
- * GET /api/admin/job?status=open|closed|draft (optional)
+ * GET /api/admin/job
  */
 
 router.get('/job', authorizeUser, (req, res) => {
@@ -225,7 +220,7 @@ router.get('/job', authorizeUser, (req, res) => {
 
 /*
  * ADMIN – LIST APPLICATIONS
- * GET /api/admin/applications?stage=applied|shortlisted|... (optional)
+ * GET /api/admin/application
  */
 router.get('/application', authorizeUser, (req, res) => {
     const role = req.headers.role;
@@ -272,8 +267,8 @@ router.get('/application', authorizeUser, (req, res) => {
 
 /*
  * ADMIN – VIEW AUDIT LOGS
- * GET /api/admin/audit?target_type=user|company|job|application&target_id=...&limit=50
- */
+ * GET /api/admin/audit
+ *  */
 router.get('/audit', authorizeUser, (req, res) => {
     const role = req.headers.role;
     if (role !== 'admin') {

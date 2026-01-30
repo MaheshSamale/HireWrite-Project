@@ -44,17 +44,27 @@ router.post('/jobs', authorizeUser, (req, res) => {
         const skillsPref = skills_preferred_json ? JSON.stringify(skills_preferred_json) : null;
 
         const insertSql = `
-            INSERT INTO Jobs (
-                job_id, org_id, title, location_type, employment_type,
-                experience_min, experience_max, skills_required_json,
-                skills_preferred_json, jd_text, status, created_at
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', NOW())
-        `;
+        INSERT INTO Jobs (
+            job_id,
+            org_id,
+            created_by_user_id,
+            title,
+            location_type,
+            employment_type,
+            experience_min,
+            experience_max,
+            skills_required_json,
+            skills_preferred_json,
+            jd_text,
+            status,
+            created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', NOW())
+    `;
 
         pool.query(
             insertSql,
-            [job_id, org_id, title, location_type, employment_type,
+            [job_id, org_id, user_id,title, location_type, employment_type,
              experience_min || null, experience_max || null,
              skillsReq, skillsPref, jd_text || null],
             (err2) => {
@@ -99,7 +109,7 @@ router.get('/jobs', authorizeUser, (req, res) => {
         const org_id = rows[0].organization_id;
 
         const jobsSql = `
-            SELECT job_id, title, location_type, employment_type,
+            SELECT job_id, title,jd_text, location_type, skills_required_json,skills_preferred_json,employment_type,
                    experience_min, experience_max, status, created_at
             FROM Jobs
             WHERE org_id = ? AND is_deleted = FALSE

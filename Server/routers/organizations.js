@@ -238,4 +238,171 @@ router.post('/recruiters/login', (req, res) => {
 });
 
 
+// More Additional APIs
+
+// GET all recruiters of logged-in organization
+router.get('/recruiters', authorizeUser, (req, res) => {
+    const organization_id = req.headers.organization_id;
+    console.log('Get org recruiters for org:', organization_id);
+
+    if (!organization_id) {
+        return res.send(result.createResult('Organization token required', null));
+    }
+
+    const sql = `
+        SELECT 
+            ou.recruiter_id,
+            ou.user_id,
+            ou.name,
+            ou.position,
+            ou.org_role,
+            ou.created_at,
+            u.email,
+            u.mobile,
+            u.profile_photo_url
+        FROM OrgUsers ou
+        JOIN Users u ON ou.user_id = u.user_id
+        WHERE ou.organization_id = ? 
+          AND ou.is_deleted = FALSE
+          AND u.is_deleted = FALSE
+        ORDER BY ou.created_at DESC
+    `;
+
+    pool.query(sql, [organization_id], (err, rows) => {
+        if (err) return res.send(result.createResult(err, null));
+        res.send(result.createResult(null, rows));
+    });
+});
+
+
+
+// DELETE (soft) recruiter from organization
+router.delete('/recruiters/:recruiter_id', authorizeUser, (req, res) => {
+    const organization_id = req.headers.organization_id;
+    const { recruiter_id } = req.params;
+
+    console.log('Delete recruiter:', recruiter_id, 'for org:', organization_id);
+
+    if (!organization_id) {
+        return res.send(result.createResult('Organization token required', null));
+    }
+
+    const checkSql = `
+        SELECT recruiter_id 
+        FROM OrgUsers 
+        WHERE recruiter_id = ? AND organization_id = ? AND is_deleted = FALSE
+        LIMIT 1
+    `;
+
+    pool.query(checkSql, [recruiter_id, organization_id], (err, rows) => {
+        if (err) return res.send(result.createResult(err, null));
+        if (rows.length === 0) {
+            return res.send(result.createResult('Recruiter not found in this organization', null));
+        }
+
+        const deleteSql = `
+            UPDATE OrgUsers
+            SET is_deleted = TRUE, updated_at = NOW()
+            WHERE recruiter_id = ?
+        `;
+
+        pool.query(deleteSql, [recruiter_id], (err2, data) => {
+            if (err2) return res.send(result.createResult(err2, null));
+
+            res.send(result.createResult(null, {
+                recruiter_id,
+                message: 'Recruiter removed from organization'
+            }));
+        });
+    });
+});
+
+
+
+// GET all jobs posted by this organization (all recruiters)
+router.get('/jobs', authorizeUser, (req, res) => {
+    const organization_id = req.headers.organization_id;
+    console.log('Get org jobs for org:', organization_id);
+
+    if (!organization_id) {
+        return res.send(result.createResult('Organization token required', null));
+    }
+
+    const sql = `
+        SELECT 
+            j.job_id,
+            j.created_by_user_id,
+            j.title,
+            j.jd_text,
+            j.location_type,
+            j.employment_type,
+            j.experience_min,
+            j.experience_max,
+            j.status,
+            j.created_at,
+            j.skills_required_json,
+            j.skills_preferred_json
+        FROM Jobs j
+        WHERE j.org_id = ? 
+          AND j.is_deleted = FALSE
+        ORDER BY j.created_at DESC
+    `;
+
+    pool.query(sql, [organization_id], (err, rows) => {
+        if (err) return res.send(result.createResult(err, null));
+        res.send(result.createResult(null, rows));
+    });
+});
+
+
+// GET jobs created by specific recruiter in this org
+router.get('/recruiters/:recruiter_id/jobs', authorizeUser, (req, res) => {
+    const organization_id = req.headers.organization_id;
+    const { recruiter_id } = req.params;
+
+    if (!organization_id) {
+        return res.send(result.createResult('Organization token required', null));
+    }
+
+    const checkSql = `
+        SELECT user_id 
+        FROM OrgUsers
+        WHERE recruiter_id = ? AND organization_id = ? AND is_deleted = FALSE
+        LIMIT 1
+    `;
+
+    pool.query(checkSql, [recruiter_id, organization_id], (err, rows) => {
+        if (err) return res.send(result.createResult(err, null));
+        if (rows.length === 0) {
+            return res.send(result.createResult('Recruiter not found in this organization', null));
+        }
+
+        const recruiter_user_id = rows[0].user_id;
+
+        const jobsSql = `
+            SELECT 
+                j.job_id,
+                j.title,
+                j.jd_text,
+                j.location_type,
+                j.employment_type,
+                j.experience_min,
+                j.experience_max,
+                j.status,
+                j.created_at
+            FROM Jobs j
+            WHERE j.org_id = ?
+              AND j.created_by_user_id = ?
+              AND j.is_deleted = FALSE
+            ORDER BY j.created_at DESC
+        `;
+
+        pool.query(jobsSql, [organization_id, recruiter_user_id], (err2, jobs) => {
+            if (err2) return res.send(result.createResult(err2, null));
+            res.send(result.createResult(null, jobs));
+        });
+    });
+});
+
+
 module.exports = router;
