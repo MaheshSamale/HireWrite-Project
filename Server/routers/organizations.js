@@ -15,10 +15,15 @@ router.post('/register', (req, res) => {
     
     const { name, website, description, email, password } = req.body;
     console.log("Organization register:", email);
-    
+
     // Validation
     if (!name || !email || !password) {
         return res.send(result.createResult('Organization name, email, and password required', null));
+    }
+
+
+    if (!name || !email || !password) {
+          return res.send(result.createResult('Organizatio'))
     }
 
     // 1. Check if organization already exists
@@ -99,7 +104,7 @@ router.post('/login', (req, res) => {
 
 // ADD RECRUITER (Organization Admin only) - Creates Users + OrgUsers
 router.post('/recruiters', authorizeUser, (req, res) => {
-    console.log("rectruter called"); // Your debug log
+    console.log("recruiter called"); // Your debug log
     
     const organization_id = req.headers.organization_id;
     console.log("Organization ID from token:", organization_id);
