@@ -399,5 +399,103 @@ router.get('/recruiters/:recruiter_id/jobs', authorizeUser, (req, res) => {
     });
 });
 
+router.get('/profile', authorizeUser, (req, res) => {
+    const organization_id = req.headers.organization_id;
+
+    if (!organization_id) {
+        return res.send(result.createResult('Organization ID not found in request', null));
+    }
+
+    const sql = `SELECT organization_id, name, website, description, email, logo_url, created_at 
+                 FROM Organizations 
+                 WHERE organization_id = ? AND is_deleted = FALSE`;
+
+    pool.query(sql, [organization_id], (err, data) => {
+        if (err) return res.send(result.createResult(err, null));
+        if (data.length === 0) {
+            return res.send(result.createResult('Organization not found', null));
+        }
+        res.send(result.createResult(null, data[0]));
+    });
+});
+
+// GET /api/organizations/jobs/:jobId - Complete job details + recruiter info
+router.get('/jobs/:jobId', authorizeUser, (req, res) => {
+    const organization_id = req.headers.organization_id;
+    const { jobId } = req.params;
+    
+    console.log('🔍 === JOB DETAILS ===', { organization_id, jobId });
+    
+    const sql = `
+        SELECT 
+            -- Job core details
+            j.job_id, j.title, j.jd_text, j.status,
+            j.location_type, j.employment_type,
+            j.experience_min, j.experience_max,
+            j.skills_required_json, j.skills_preferred_json,
+            j.created_at, j.updated_at,
+            
+            -- Posted by (recruiter) - FIXED: u.email instead of r.email
+            r.name as posted_by_name,
+            r.position as posted_by_position,
+            u.email as posted_by_email,
+            
+            -- Organization
+            o.name as organization_name,
+            o.logo_url,
+            
+            -- Application stats
+            COUNT(a.application_id) as application_count,
+            
+            -- ✅ FITMENT SCORES (aggregated)
+            AVG(jfs.semantic_score) as avg_fitment_score,
+            COUNT(jfs.id) as fitment_count,
+            SUM(CASE WHEN jfs.fit_flag = 1 THEN 1 ELSE 0 END) as strong_fits
+            
+        FROM Jobs j
+        JOIN Organizations o ON j.org_id = o.organization_id AND o.is_deleted = 0
+        
+        -- Posted by recruiter - JOIN Users table for email
+        LEFT JOIN OrgUsers r ON j.created_by_user_id = r.user_id 
+            AND r.organization_id = o.organization_id AND r.is_deleted = 0
+        LEFT JOIN Users u ON r.user_id = u.user_id AND u.is_deleted = 0
+        
+        -- Applications count
+        LEFT JOIN Applications a ON j.job_id = a.job_id AND a.is_deleted = 0
+        
+        -- Fitment scores from candidates
+        LEFT JOIN JobFitmentScores jfs ON j.job_id = jfs.job_id AND jfs.is_deleted = 0
+        
+        WHERE j.job_id = ? 
+          AND j.org_id = ? 
+          AND j.is_deleted = 0
+        GROUP BY j.job_id, j.title, j.jd_text, j.status, j.location_type, 
+                 j.employment_type, j.experience_min, j.experience_max,
+                 j.skills_required_json, j.skills_preferred_json,
+                 j.created_at, j.updated_at, r.name, r.position, u.email,
+                 o.name, o.logo_url
+    `;
+    
+    pool.query(sql, [jobId, organization_id], (err, rows) => {
+        if (err) {
+            console.error('💥 Job details query error:', err);
+            return res.send(result.createResult(err, null));
+        }
+        
+        if (rows.length === 0) {
+            return res.send(result.createResult('Job not found or access denied', null));
+        }
+        
+        const job = rows[0];
+        console.log('✅ Job details:', {
+            title: job.title,
+            applications: job.application_count,
+            avg_fitment: job.avg_fitment_score
+        });
+        
+        res.send(result.createResult(null, job));
+    });
+});
+
 
 module.exports = router;

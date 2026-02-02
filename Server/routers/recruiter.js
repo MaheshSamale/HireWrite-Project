@@ -227,5 +227,74 @@ router.put('/applications/:application_id/stage', authorizeUser, (req, res) => {
     });
 });
 
+router.get('/me', authorizeUser, (req, res) => {
+    const { user_id, role } = req.headers;
+    
+    if (role !== 'recruiter') {
+        return res.send(result.createResult('Access denied: recruiter only', null));
+    }
+    
+    pool.query(`
+        SELECT 
+          
+            u.user_id, u.email, u.mobile, u.profile_photo_url, u.role,
+            ou.recruiter_id, ou.name as recruiter_name, ou.position, ou.org_role,
+            o.organization_id, o.name as organization_name, o.website, o.logo_url, o.description,
+            
+          
+            (SELECT COUNT(*) FROM Jobs WHERE created_by_user_id = u.user_id AND is_deleted = 0) as total_jobs,
+            (SELECT COUNT(*) FROM Jobs WHERE created_by_user_id = u.user_id AND status = 'open' AND is_deleted = 0) as open_jobs,
+            (SELECT COUNT(*) FROM Applications a 
+             JOIN Jobs j ON a.job_id = j.job_id 
+             WHERE j.created_by_user_id = u.user_id AND a.is_deleted = 0 AND j.is_deleted = 0) as total_applications
+            
+        FROM Users u 
+        JOIN OrgUsers ou ON u.user_id = ou.user_id AND ou.is_deleted = 0
+        JOIN Organizations o ON ou.organization_id = o.organization_id AND o.is_deleted = 0
+        WHERE u.user_id = ? AND u.is_deleted = 0
+        LIMIT 1
+    `, [user_id], (err, rows) => {
+        if (err || !rows.length) {
+            return res.send(result.createResult(err || 'Recruiter profile not found', null));
+        }
+        
+        const profile = rows[0];
+        
+        // ✅ Debug log - REMOVE in production
+        console.log(' Stats:', {
+            user_id: user_id,
+            total_jobs: profile.total_jobs,
+            open_jobs: profile.open_jobs, 
+            total_applications: profile.total_applications
+        });
+        
+        res.send(result.createResult(null, {
+            profile: {
+                user_id: profile.user_id,
+                recruiter_id: profile.recruiter_id,
+                recruiter_name: profile.recruiter_name,
+                email: profile.email,
+                mobile: profile.mobile ,
+                position: profile.position ,
+                org_role: profile.org_role ,
+                profile_photo_url: profile.profile_photo_url ,
+                has_photo: !!profile.profile_photo_url
+            },
+            organization: {
+                organization_id: profile.organization_id,
+                name: profile.organization_name,
+                website: profile.website,
+                logo_url: profile.logo_url,
+                description: profile.description
+            },
+            stats: {
+                total_jobs: parseInt(profile.total_jobs),
+                open_jobs: parseInt(profile.open_jobs),
+                total_applications: parseInt(profile.total_applications)
+            }
+        }));
+    });
+});
+
 
 module.exports = router;
