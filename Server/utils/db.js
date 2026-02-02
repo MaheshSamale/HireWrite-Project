@@ -9,10 +9,12 @@ const pool = mysql.createPool({
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    ssl: {
-        ca: fs.readFileSync(path.join(__dirname, 'ca.pem')),
-        rejectUnauthorized: true
-    },
+ssl: {
+    // If DB_SSL_CA exists in Vercel env, use it. 
+    // Otherwise, fall back to reading the local file for your local computer.
+    ca: process.env.DB_SSL_CA || fs.readFileSync(path.join(__dirname, 'ca.pem')),
+    rejectUnauthorized: true
+},,
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
