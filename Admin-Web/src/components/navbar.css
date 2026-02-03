@@ -1,0 +1,239 @@
+/* Navbar.css */
+
+/* Layout Wrapper */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-body);
+}
+
+.main-content {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  transition: margin-left 0.3s ease;
+  width: calc(100% - var(--sidebar-width));
+}
+
+.content-wrapper {
+  padding: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Sidebar Container */
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  transition: transform 0.3s ease;
+}
+
+/* Header */
+.sidebar-header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 50px;
+  object-fit: contain;
+}
+
+/* Close button - Hidden on desktop by default */
+.close-btn {
+  display: none; 
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+/* Navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: 24px 16px;
+  overflow-y: auto;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+}
+
+.menu-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 12px;
+  padding-left: 12px;
+  letter-spacing: 0.05em;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.nav-icon {
+  margin-right: 12px;
+  font-size: 1.1rem;
+  color: var(--text-light);
+  transition: var(--transition);
+}
+
+/* Hover & Active States */
+.nav-item:hover {
+  background-color: var(--bg-body);
+  color: var(--primary);
+}
+
+.nav-item:hover .nav-icon {
+  color: var(--primary);
+}
+
+.nav-item.active {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.nav-item.active .nav-icon {
+  color: white;
+}
+
+/* Footer Profile */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  background-color: var(--bg-surface);
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  transition: var(--transition);
+}
+
+.user-avatar, .user-avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.user-avatar-placeholder {
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-email {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.logout-icon-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+
+.logout-icon-btn:hover {
+  background-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* --- FIX: Hide overlay by default on Desktop --- */
+.sidebar-overlay {
+  display: none; 
+}
+
+/* --- Mobile Responsive (Max Width: 1024px) --- */
+@media (max-width: 1024px) {
+  
+  /* Show overlay ONLY on mobile */
+  .sidebar-overlay {
+    display: block; 
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .close-btn {
+    display: block; /* Show close button on mobile */
+  }
+  
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}

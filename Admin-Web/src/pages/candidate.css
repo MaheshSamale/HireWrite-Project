@@ -1,0 +1,154 @@
+/* ================= CONTAINER ================= */
+.candidate-container {
+  padding: 24px;
+  background-color: var(--bg-body);
+  min-height: calc(100vh - 32px);
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 12px;
+}
+
+/* ================= SEARCH ================= */
+.candidate-search {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+/* ================= CARD ================= */
+.candidate-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  padding: 8px 20px;
+}
+
+/* ================= ROW ================= */
+.candidate-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.candidate-row:last-child {
+  border-bottom: none;
+}
+
+/* ================= LEFT ================= */
+.candidate-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.candidate-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.candidate-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-icon {
+  font-size: 42px;
+  color: var(--primary-color);
+}
+
+.candidate-info p {
+  margin: 0;
+  line-height: 1.4;
+}
+
+.candidate-name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.candidate-mobile {
+  font-size: 13px;
+}
+
+.candidate-email {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ================= RIGHT ================= */
+.candidate-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.candidate-role {
+  padding: 4px 12px;
+  font-size: 12px;
+  border-radius: 20px;
+  color: var(--primary-color);
+  background: var(--primary-light);
+  text-transform: capitalize;
+}
+
+.block-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: #dc3545;
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.block-btn:hover {
+  background: #bb2d3b;
+}
+
+/* ================= PAGINATION ================= */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0 6px;
+}
+
+.pagination button {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary-color);
+  color: #fff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background: #adb5bd;
+  cursor: not-allowed;
+}
+
+/* ================= EMPTY ================= */
+.empty-text {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
