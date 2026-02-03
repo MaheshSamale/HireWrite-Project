@@ -17,6 +17,7 @@ router.post('/register', (req, res) => {
         return res.send(result.createResult('Name, email, mobile, and password required', null));
     }
 
+
     const checkSql = `SELECT user_id FROM Users WHERE email = ? OR mobile = ? AND is_deleted = FALSE`;
     pool.query(checkSql, [email, mobile], (err, checkData) => {
         if (err) return res.send(result.createResult(err, null));

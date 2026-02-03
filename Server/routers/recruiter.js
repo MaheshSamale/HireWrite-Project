@@ -70,6 +70,7 @@ router.post('/jobs', authorizeUser, (req, res) => {
             (err2) => {
                 if (err2) return res.send(result.createResult(err2, null));
 
+
                 res.send(result.createResult(null, {
                     job_id,
                     org_id,

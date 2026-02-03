@@ -1,0 +1,111 @@
+:root {
+  /* Brand Theme - Edit these to change the whole app */
+  --primary-color: #4b1db8;
+  --primary-hover: #3a168e;
+  --primary-light: rgba(75, 29, 184, 0.1);
+  --primary-gradient: linear-gradient(90deg, #4b1db8, #7b2fe0);
+  
+  /* Layout Colors */
+  --bg-body: #f4f7fe;
+  --bg-card: #ffffff;
+  --text-main: #2b3674;
+  --text-muted: #a3aed0;
+  --border-color: #e0e5f2;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text-main);
+  background-color: var(--bg-body);
+}
+
+.login-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+}
+
+.login-card {
+  width: 420px;
+  padding: 40px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.login-logo img {
+  height: 50px;
+}
+
+.login-title {
+  font-size: 22px;
+  margin-bottom: 4px;
+}
+
+.login-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  margin-bottom: 22px;
+}
+
+.input-group label {
+  font-size: 14px;
+}
+
+.input-group input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #aaa;
+  padding: 8px 0;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-bottom: 2px solid #5a2dbd;
+}
+
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 25px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: var(--primary-gradient);
+  color: #fff;
+  font-size: 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.login-footer {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.auth-link {
+  color: #5a2dbd;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
