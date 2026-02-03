@@ -22,14 +22,17 @@
 
 // module.exports = pool;
 
-
-const mysql = require('mysql2')
+const mysql = require('mysql2/promise'); // Use the promise version
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'Mahesh@123',
-    database: 'hirewrite_database'
-})
+    // Use environment variables for Render, fallback to local for development
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || 'Mahesh@123',
+    database: process.env.DB_NAME || 'hirewrite_database',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
-module.exports = pool
+module.exports = pool;
