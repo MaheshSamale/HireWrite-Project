@@ -22,14 +22,34 @@
 
 // module.exports = pool;
 
-const mysql = require('mysql2/promise'); // Use the promise version
+// const mysql = require('mysql2/promise'); // Use the promise version
+
+// const pool = mysql.createPool({
+//     // Use environment variables for Render, fallback to local for development
+//     host: process.env.DB_HOST || 'localhost',
+//     user: process.env.DB_USER || 'root',
+//     password: process.env.DB_PASSWORD || 'Mahesh@123',
+//     database: process.env.DB_NAME || 'hirewrite_database',
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0
+// });
+
+// module.exports = pool;
+
+
+
+const mysql = require('mysql2/promise'); // Must be /promise
 
 const pool = mysql.createPool({
-    // Use environment variables for Render, fallback to local for development
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'Mahesh@123',
-    database: process.env.DB_NAME || 'hirewrite_database',
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    port: process.env.DB_PORT || 3306,
+    ssl: {
+        rejectUnauthorized: false // This allows the connection to Clever Cloud
+    },
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
