@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const db = require('./utils/db'); 
 
 const userRouter = require("./routers/user");
 const orgRouter = require("./routers/organizations");
@@ -27,6 +28,32 @@ app.get('/', (req, res) => {
 // 3. APPLY AUTHENTICATION STRATEGICALLY
 // If you want EVERY route protected:
 app.use(authorizeUser); 
+app.get('/',(req,res)=>{
+    res.send('Hello from server')
+})
+// Add this below your 'Hello from server' route
+app.get('/api/health', async (req, res) => {
+    const db = require('./utils/db');
+    try {
+        // This query counts entries in your three main tables
+        const [users] = await db.query('SELECT COUNT(*) as count FROM Users');
+        const [orgs] = await db.query('SELECT COUNT(*) as count FROM Organizations');
+        const [jobs] = await db.query('SELECT COUNT(*) as count FROM Jobs');
+
+        res.json({
+            status: 'success',
+            data: {
+                total_users: users[0].count,
+                total_organizations: orgs[0].count,
+                total_jobs: jobs[0].count
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ status: 'error', error: err.message });
+    }
+});
+
+console.log('hi')
 
 // 4. Routes (Remember the prefix is /api/...)
 app.use('/api/users', userRouter);
