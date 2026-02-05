@@ -1,6 +1,5 @@
 // routers/recruiter.js
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
 const pool = require('../utils/db');
 const result = require('../utils/results');
 const authorizeUser = require('../utils/authUser');
@@ -8,6 +7,66 @@ const authorizeUser = require('../utils/authUser');
 const router = express.Router();
 
 // Create a new job (recruiter)
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { v4: uuidv4 } = require('uuid');
+
+// Initialize Gemini with your API Key
+const genAI = new GoogleGenerativeAI("AIzaSyABlYhSCXZDlV-SYkfmC_umyXA9oB-Xjxw");
+
+// --- API TO GENERATE JD TEXT ---
+router.post('/jobs/generate-description', authorizeUser, async (req, res) => {
+    try {
+        const { 
+            title, 
+            location_type, 
+            employment_type, 
+            experience_min, 
+            experience_max, 
+            skills_required, 
+            skills_preferred 
+        } = req.body;
+
+        if (!title || !skills_required) {
+            return res.send(result.createResult('Title and Required Skills are required', null));
+        }
+
+        // Use a valid model version (1.5-flash is perfect for short, fast tasks)
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+        // Optimized prompt for a 6-10 line summary
+        const prompt = `
+            Write a concise, high-impact Job Description for the role of ${title}.
+            
+            Details:
+            - Setup: ${location_type} / ${employment_type}
+            - Experience: ${experience_min}-${experience_max} years
+            - Key Skills: ${skills_required}
+            ${skills_preferred ? `- Plus: ${skills_preferred}` : ''}
+
+            STRICT CONSTRAINTS:
+            1. Length: Exactly 6 to 10 lines total.
+            2. Format: Plain text only. 
+            3. Content: Combine the role's purpose, top 3 responsibilities, and key requirements into a single punchy paragraph or short list. 
+            4. Tone: Professional and exciting.
+            5. No placeholders (like [Company Name]).
+        `;
+
+        const chatResponse = await model.generateContent(prompt);
+        const responseText = chatResponse.response.text();
+
+        // Send back to your React Native app
+        res.send(result.createResult(null, { 
+            jd_text: responseText.trim() 
+        }));
+
+    } catch (error) {
+        console.error("Gemini Backend Error:", error);
+        res.send(result.createResult('AI Generation failed: ' + error.message, null));
+    }
+});
+
+// --- UPDATED CREATE JOB API ---
+// Keep your original create API but ensure jd_text is handled
 router.post('/jobs', authorizeUser, (req, res) => {
     const user_id = req.headers.user_id;
     const role = req.headers.role;
@@ -16,69 +75,70 @@ router.post('/jobs', authorizeUser, (req, res) => {
         return res.send(result.createResult('Access denied: recruiter only', null));
     }
 
-    const { title, location_type, employment_type, experience_min, experience_max,
-            skills_required_json, skills_preferred_json, jd_text } = req.body;
+    const { 
+        title, location_type, employment_type, experience_min, experience_max,
+        skills_required_json, skills_preferred_json, jd_text 
+    } = req.body;
 
-    if (!title || !location_type || !employment_type) {
-        return res.send(result.createResult('title, location_type, employment_type are required', null));
-    }
-
-    // Get recruiter org_id
-    const orgSql = `
-        SELECT organization_id 
-        FROM OrgUsers 
-        WHERE user_id = ? AND is_deleted = FALSE
-        LIMIT 1
-    `;
+    // Check Recruiter Organization
+    const orgSql = `SELECT organization_id FROM OrgUsers WHERE user_id = ? AND is_deleted = FALSE LIMIT 1`;
 
     pool.query(orgSql, [user_id], (err, rows) => {
         if (err) return res.send(result.createResult(err, null));
-        if (rows.length === 0) {
-            return res.send(result.createResult('Recruiter organization not found', null));
-        }
+        if (rows.length === 0) return res.send(result.createResult('Recruiter organization not found', null));
 
         const org_id = rows[0].organization_id;
         const job_id = uuidv4();
 
-        const skillsReq = skills_required_json ? JSON.stringify(skills_required_json) : null;
-        const skillsPref = skills_preferred_json ? JSON.stringify(skills_preferred_json) : null;
-
         const insertSql = `
-        INSERT INTO Jobs (
-            job_id,
-            org_id,
-            created_by_user_id,
-            title,
-            location_type,
-            employment_type,
-            experience_min,
-            experience_max,
-            skills_required_json,
-            skills_preferred_json,
-            jd_text,
-            status,
-            created_at
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', NOW())
-    `;
+            INSERT INTO Jobs (
+                job_id, org_id, created_by_user_id, title, location_type, 
+                employment_type, experience_min, experience_max, 
+                skills_required_json, skills_preferred_json, jd_text, status, created_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', NOW())
+        `;
 
         pool.query(
             insertSql,
-            [job_id, org_id, user_id,title, location_type, employment_type,
-             experience_min || null, experience_max || null,
-             skillsReq, skillsPref, jd_text || null],
+            [
+                job_id, org_id, user_id, title, location_type, 
+                employment_type, experience_min, experience_max,
+                JSON.stringify(skills_required_json), 
+                JSON.stringify(skills_preferred_json), 
+                jd_text
+            ],
             (err2) => {
                 if (err2) return res.send(result.createResult(err2, null));
-
-                res.send(result.createResult(null, {
-                    job_id,
-                    org_id,
-                    title,
-                    status: 'open',
-                    message: 'Job created successfully'
-                }));
+                res.send(result.createResult(null, { job_id, message: 'Job created successfully' }));
             }
         );
+    });
+});
+
+router.put('/jobs/status', authorizeUser, (req, res) => {
+    const { job_id, status } = req.body; // status should be 'open' or 'closed'
+    const user_id = req.headers.user_id;
+
+    if (!job_id || !status) {
+        return res.send(result.createResult('job_id and status are required', null));
+    }
+
+    // Update query ensures the recruiter can only update jobs they created
+    const updateSql = `
+        UPDATE Jobs 
+        SET status = ? 
+        WHERE job_id = ? AND created_by_user_id = ?
+    `;
+
+    pool.query(updateSql, [status, job_id, user_id], (err, dbResult) => {
+        if (err) return res.send(result.createResult(err, null));
+        
+        if (dbResult.affectedRows === 0) {
+            return res.send(result.createResult('Job not found or unauthorized', null));
+        }
+
+        res.send(result.createResult(null, { message: `Job marked as ${status}` }));
     });
 });
 
@@ -92,27 +152,36 @@ router.get('/jobs', authorizeUser, (req, res) => {
         return res.send(result.createResult('Access denied: recruiter only', null));
     }
 
-    const orgSql = `
-        SELECT organization_id 
-        FROM OrgUsers 
-        WHERE user_id = ? AND is_deleted = FALSE
-        LIMIT 1
-    `;
+    const orgSql = `SELECT organization_id FROM OrgUsers WHERE user_id = ? AND is_deleted = FALSE LIMIT 1`;
 
     pool.query(orgSql, [user_id], (err, rows) => {
         if (err) return res.send(result.createResult(err, null));
-        if (rows.length === 0) {
-            return res.send(result.createResult('Recruiter organization not found', null));
-        }
+        if (rows.length === 0) return res.send(result.createResult('Recruiter organization not found', null));
 
         const org_id = rows[0].organization_id;
 
+        // UPDATED SQL: Includes LEFT JOIN and COUNT()
         const jobsSql = `
-            SELECT job_id, title,jd_text, location_type, skills_required_json,skills_preferred_json,employment_type,
-                   experience_min, experience_max, status, created_at
-            FROM Jobs
-            WHERE org_id = ? AND is_deleted = FALSE
-            ORDER BY created_at DESC
+            SELECT 
+                j.job_id, 
+                j.title, 
+                j.jd_text, 
+                j.location_type, 
+                j.skills_required_json, 
+                j.skills_preferred_json, 
+                j.employment_type, 
+                j.experience_min, 
+                j.experience_max, 
+                j.status, 
+                j.created_at,
+                COUNT(a.application_id) AS total_applications
+            FROM Jobs j
+            LEFT JOIN Applications a ON j.job_id = a.job_id AND a.is_deleted = FALSE
+            WHERE j.org_id = ? AND j.is_deleted = FALSE
+            GROUP BY j.job_id
+            ORDER BY 
+                CASE WHEN j.status = 'open' THEN 1 ELSE 2 END ASC, 
+                j.created_at DESC
         `;
 
         pool.query(jobsSql, [org_id], (err2, jobs) => {
@@ -121,6 +190,56 @@ router.get('/jobs', authorizeUser, (req, res) => {
         });
     });
 });
+
+
+// Get all applications for a job (owned by this recruiter org)
+// router.get('/jobs/:job_id/applications', authorizeUser, (req, res) => {
+//     const user_id = req.headers.user_id;
+//     const role = req.headers.role;
+//     const { job_id } = req.params;
+
+//     if (role !== 'recruiter') {
+//         return res.send(result.createResult('Access denied: recruiter only', null));
+//     }
+
+//     // Ensure job belongs to recruiter org
+//     const orgSql = `
+//         SELECT j.job_id
+//         FROM Jobs j
+//         JOIN OrgUsers ou ON j.org_id = ou.organization_id
+//         WHERE j.job_id = ? AND ou.user_id = ? AND j.is_deleted = FALSE
+//         LIMIT 1
+//     `;
+//     pool.query(orgSql, [job_id, user_id], (err, rows) => {
+//         if (err) return res.send(result.createResult(err, null));
+//         if (rows.length === 0) {
+//             return res.send(result.createResult('Job not found or not your organization', null));
+//         }
+
+//         const appSql = `
+//             SELECT 
+//                 a.application_id,
+//                 a.stage,
+//                 a.decision,
+//                 a.created_at,
+//                 u.user_id,
+//                 u.email,
+//                 u.mobile,
+//                 cp.candidate_id,
+//                 cp.name
+//             FROM Applications a
+//             JOIN Users u ON a.user_id = u.user_id
+//             LEFT JOIN CandidateProfiles cp ON u.user_id = cp.user_id
+//             WHERE a.job_id = ? AND a.is_deleted = FALSE
+//             ORDER BY a.created_at DESC
+//         `;
+
+//         pool.query(appSql, [job_id], (err2, apps) => {
+//             if (err2) return res.send(result.createResult(err2, null));
+//             res.send(result.createResult(null, apps));
+//         });
+//     });
+// });
 
 
 // Get all applications for a job (owned by this recruiter org)
@@ -133,7 +252,7 @@ router.get('/jobs/:job_id/applications', authorizeUser, (req, res) => {
         return res.send(result.createResult('Access denied: recruiter only', null));
     }
 
-    // Ensure job belongs to recruiter org
+    // 1. Ensure job belongs to recruiter org
     const orgSql = `
         SELECT j.job_id
         FROM Jobs j
@@ -147,6 +266,7 @@ router.get('/jobs/:job_id/applications', authorizeUser, (req, res) => {
             return res.send(result.createResult('Job not found or not your organization', null));
         }
 
+        // 2. Fetch applications with candidate details AND AI scores
         const appSql = `
             SELECT 
                 a.application_id,
@@ -156,11 +276,21 @@ router.get('/jobs/:job_id/applications', authorizeUser, (req, res) => {
                 u.user_id,
                 u.email,
                 u.mobile,
+                u.profile_photo_url,
                 cp.candidate_id,
-                cp.name
+                cp.name AS candidate_name,
+                r.storage_path AS resume_storage_path,
+                -- AI Score Fields
+                jfs.keyword_score,
+                jfs.semantic_score,
+                jfs.fit_flag,
+                jfs.explanation AS fitment_explanation
             FROM Applications a
             JOIN Users u ON a.user_id = u.user_id
             LEFT JOIN CandidateProfiles cp ON u.user_id = cp.user_id
+            LEFT JOIN Resumes r ON a.resume_id = r.resume_id
+            -- Join JobFitmentScores based on user_id and job_id
+            LEFT JOIN JobFitmentScores jfs ON a.user_id = jfs.user_id AND a.job_id = jfs.job_id
             WHERE a.job_id = ? AND a.is_deleted = FALSE
             ORDER BY a.created_at DESC
         `;
@@ -171,7 +301,6 @@ router.get('/jobs/:job_id/applications', authorizeUser, (req, res) => {
         });
     });
 });
-
 
 // Update stage or decision for an application
 router.put('/applications/:application_id/stage', authorizeUser, (req, res) => {

@@ -17,10 +17,6 @@ const authorizeUser = require('../utils/authUser');
 const router = express.Router();
 
 
-
-
-
-
 // Create resumes upload folder if not exists
 const resumesDir = path.join(__dirname, '..', 'uploads', 'resumes');
 if (!fs.existsSync(resumesDir)) {
@@ -94,7 +90,7 @@ router.post('/jobs/:jobId/gemini-score', authorizeUser, async (req, res) => {
       
       // 3. PURE GEMINI CALL
       console.log('🤖 Calling Gemini 2.5 Flash...');
-      const genAI = new GoogleGenerativeAI('AIzaSyC-0Xxjk70ROCXpB5AdifzJrhflqjWuxfo');
+      const genAI = new GoogleGenerativeAI('AIzaSyABlYhSCXZDlV-SYkfmC_umyXA9oB-Xjxw');
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       
       const prompt = `Score candidate fit (0-100) for this job:
