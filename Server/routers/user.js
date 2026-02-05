@@ -130,8 +130,6 @@ const upload = multer({
 });
 
 
-
-
 // POST /api/users/profile-photo
 router.post('/profile-photo', authorizeUser, upload.single('photo'), (req, res) => {
     const user_id = req.headers.user_id;
@@ -161,5 +159,7 @@ router.post('/profile-photo', authorizeUser, upload.single('photo'), (req, res) 
     });
 });
 
-// Additional user-related routes can be added here
+
+
+
 module.exports = router;  
