@@ -1,0 +1,38 @@
+{
+  "info": {
+    "_postman_id": "021eb8e9-92f6-4c1e-8770-dd20b8d20378",
+    "name": "AIMP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "New Request",
+      "id": "32454777-2b63-471a-8ab8-a9a45a0b9020",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"experience\":15\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:4000/predict-salary",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "predict-salary"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

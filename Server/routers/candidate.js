@@ -17,10 +17,6 @@ const authorizeUser = require('../utils/authUser');
 const router = express.Router();
 
 
-
-
-
-
 // Create resumes upload folder if not exists
 const resumesDir = path.join(__dirname, '..', 'uploads', 'resumes');
 if (!fs.existsSync(resumesDir)) {
@@ -94,7 +90,7 @@ router.post('/jobs/:jobId/gemini-score', authorizeUser, async (req, res) => {
       
       // 3. PURE GEMINI CALL
       console.log('🤖 Calling Gemini 2.5 Flash...');
-      const genAI = new GoogleGenerativeAI('AIzaSyCQ0U1Ysp_rUDmicOD_Q6nYeVlZclLh95U');
+      const genAI = new GoogleGenerativeAI('AIzaSyABlYhSCXZDlV-SYkfmC_umyXA9oB-Xjxw');
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       
       const prompt = `Score candidate fit (0-100) for this job:
@@ -899,6 +895,95 @@ router.get('/fitment/:jobId', authorizeUser, (req, res) => {
     });
 });
 
+// GET /api/candidates/stats/applications - Application statistics dashboard
+router.get('/stats/applications', authorizeUser, (req, res) => {
+    const user_id = req.headers.user_id;
+    
+    console.log('📊 === APPLICATION STATS ===', { user_id });
+    
+    // 1. Main stats query - counts + candidate details
+    const statsSql = `
+        SELECT 
+            -- Counts by stage
+            SUM(CASE WHEN a.stage = 'applied' THEN 1 ELSE 0 END) as applied_count,
+            SUM(CASE WHEN a.stage = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted_count,
+            SUM(CASE WHEN a.stage = 'interview' THEN 1 ELSE 0 END) as interview_count,
+            SUM(CASE WHEN a.stage = 'offer' THEN 1 ELSE 0 END) as offer_count,
+            SUM(CASE WHEN a.stage = 'hired' THEN 1 ELSE 0 END) as hired_count,
+            SUM(CASE WHEN a.stage = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
+            
+            -- Total applications
+            COUNT(*) as total_applications,
+            
+            -- Recent applications with candidate details (last 10)
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'application_id', a.application_id,
+                    'job_title', j.title,
+                    'organization', o.name,
+                    'stage', a.stage,
+                    'candidate_name', COALESCE(cp.name, u.email),
+                    'profile_photo', u.profile_photo_url,
+                    'created_at', a.created_at,
+                    'fit_score', jfs.semantic_score
+                )
+            ) as recent_applications
+            
+        FROM Applications a
+        JOIN Jobs j ON a.job_id = j.job_id AND j.is_deleted = FALSE
+        JOIN Organizations o ON j.org_id = o.organization_id AND o.is_deleted = FALSE
+        LEFT JOIN CandidateProfiles cp ON a.user_id = cp.user_id AND cp.is_deleted = FALSE
+        LEFT JOIN Users u ON a.user_id = u.user_id AND u.is_deleted = FALSE
+        LEFT JOIN JobFitmentScores jfs ON a.user_id = jfs.user_id AND a.job_id = jfs.job_id AND jfs.is_deleted = FALSE
+        
+        WHERE a.user_id = ? AND a.is_deleted = FALSE
+    `;
+    
+    pool.query(statsSql, [user_id], (err, statsResult) => {
+        if (err) {
+            console.error('💥 Stats query error:', err);
+            return res.send(result.createResult(err, null));
+        }
+        
+        const stats = statsResult[0] || {};
+        
+        // Parse recent applications safely
+        let recentApps = [];
+        try {
+            if (stats.recent_applications) {
+                recentApps = JSON.parse(stats.recent_applications);
+            }
+        } catch (e) {
+            console.log('⚠️ Recent apps JSON parse failed:', e.message);
+        }
+        
+        // 2. Stage progression summary
+        const stageSummary = {
+            applied: parseInt(stats.applied_count || 0),
+            shortlisted: parseInt(stats.shortlisted_count || 0),
+            interview: parseInt(stats.interview_count || 0),
+            offer: parseInt(stats.offer_count || 0),
+            hired: parseInt(stats.hired_count || 0),
+            rejected: parseInt(stats.rejected_count || 0),
+            total: parseInt(stats.total_applications || 0)
+        };
+        
+        // 3. Success rate
+        const successRate = stageSummary.total > 0 
+            ? ((stageSummary.hired + stageSummary.offer) / stageSummary.total * 100).toFixed(1)
+            : 0;
+        
+        console.log('📊 Stats:', stageSummary, 'Success:', successRate + '%');
+        
+        res.send(result.createResult(null, {
+            summary: stageSummary,
+            successRate: parseFloat(successRate),
+            recentApplications: recentApps.slice(0, 10), // Limit to 10
+            lastUpdated: new Date().toISOString(),
+            message: `Found ${stageSummary.total} total applications`
+        }));
+    });
+});
 
 module.exports = router;  
 

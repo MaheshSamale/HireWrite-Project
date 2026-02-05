@@ -1,0 +1,1 @@
+# HireWrite - AI Job Board
