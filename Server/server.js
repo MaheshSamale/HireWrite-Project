@@ -32,25 +32,35 @@ app.get('/',(req,res)=>{
     res.send('Hello from server')
 })
 // Add this below your 'Hello from server' route
-app.get('/api/health', async (req, res) => {
-    const db = require('./utils/db');
-    try {
-        // This query counts entries in your three main tables
-        const [users] = await db.query('SELECT COUNT(*) as count FROM Users');
-        const [orgs] = await db.query('SELECT COUNT(*) as count FROM Organizations');
-        const [jobs] = await db.query('SELECT COUNT(*) as count FROM Jobs');
+app.get('/api/health', (req, res) => {
+    // Note: Removed 'async' and changed to callback style to match your routers
+    const sql = `
+        SELECT 'users' AS type, COUNT(*) AS count FROM Users
+        UNION ALL
+        SELECT 'orgs', COUNT(*) FROM Organizations
+        UNION ALL
+        SELECT 'jobs', COUNT(*) FROM Jobs
+    `;
+
+    db.query(sql, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ status: 'error', error: err.message });
+        }
+
+        const data = {};
+        rows.forEach(row => {
+            data[row.type] = row.count;
+        });
 
         res.json({
             status: 'success',
             data: {
-                total_users: users[0].count,
-                total_organizations: orgs[0].count,
-                total_jobs: jobs[0].count
+                total_users: data.users,
+                total_organizations: data.orgs,
+                total_jobs: data.jobs
             }
         });
-    } catch (err) {
-        res.status(500).json({ status: 'error', error: err.message });
-    }
+    });
 });
 
 console.log('hi')
