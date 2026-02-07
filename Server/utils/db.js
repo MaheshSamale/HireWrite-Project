@@ -39,7 +39,7 @@
 
 
 
-const mysql = require('mysql2/promise'); // Must be /promise
+const mysql = require('mysql2'); // Must be /promise
 
 const pool = mysql.createPool({
     host: 'localhost',
