@@ -39,13 +39,35 @@
 
 
 
-const mysql = require('mysql2/promise'); // Must be /promise
+// const mysql = require('mysql2/promise'); // Must be /promise
+
+// const pool = mysql.createPool({
+//     host: 'localhost',
+//     user: 'root',
+//     password: 'Rutuja0802@',
+//     database: 'hirewrite_database'
+// })
+
+// module.exports = pool;
+
+
+
+
+const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'Rutuja0802@',
-    database: 'hirewrite_database'
-})
+    host: process.env.MYSQL_ADDON_HOST,
+    user: process.env.MYSQL_ADDON_USER,
+    password: process.env.MYSQL_ADDON_PASSWORD,
+    database: process.env.MYSQL_ADDON_DB,
+    port: process.env.MYSQL_ADDON_PORT || 3306,
+    // Clever Cloud usually requires SSL for external connections
+    ssl: {
+        rejectUnauthorized: false
+    },
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
 
 module.exports = pool;
