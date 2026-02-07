@@ -25,15 +25,12 @@ app.get('/', (req, res) => {
     res.send('Hello from server');
 });
 
-// 3. APPLY AUTHENTICATION STRATEGICALLY
-// If you want EVERY route protected:
+
 app.use(authorizeUser); 
-app.get('/',(req,res)=>{
-    res.send('Hello from server')
-})
-// Add this below your 'Hello from server' route
+
+app.get('/', (req, res) => res.send('Hello from server'));
+
 app.get('/api/health', (req, res) => {
-    // Note: Removed 'async' and changed to callback style to match your routers
     const sql = `
         SELECT 'users' AS type, COUNT(*) AS count FROM Users
         UNION ALL
@@ -41,17 +38,10 @@ app.get('/api/health', (req, res) => {
         UNION ALL
         SELECT 'jobs', COUNT(*) FROM Jobs
     `;
-
     db.query(sql, (err, rows) => {
-        if (err) {
-            return res.status(500).json({ status: 'error', error: err.message });
-        }
-
+        if (err) return res.status(500).json({ status: 'error', error: err.message });
         const data = {};
-        rows.forEach(row => {
-            data[row.type] = row.count;
-        });
-
+        rows.forEach(row => { data[row.type] = row.count; });
         res.json({
             status: 'success',
             data: {
