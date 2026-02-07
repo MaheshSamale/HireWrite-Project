@@ -1,5 +1,6 @@
 const config = {
-    BASE_URL: 'http://localhost:4000/api'
+
+    BASE_URL: 'https://hirewrite-project.onrender.com/api'
 }
 
-export default config
+export default config;
