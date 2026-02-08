@@ -90,7 +90,7 @@ router.post('/jobs/:jobId/gemini-score', authorizeUser, async (req, res) => {
       
       // 3. PURE GEMINI CALL
       console.log('🤖 Calling Gemini 2.5 Flash...');
-      const genAI = new GoogleGenerativeAI('AIzaSyABlYhSCXZDlV-SYkfmC_umyXA9oB-Xjxw');
+     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       
       const prompt = `Score candidate fit (0-100) for this job:
