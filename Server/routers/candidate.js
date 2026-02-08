@@ -919,5 +919,49 @@ router.get('/fitment/:jobId', authorizeUser, (req, res) => {
 });
 
 
+// Add this to your candidate.js router
+router.get('/stats/applications', authorizeUser, (req, res) => {
+    const user_id = req.headers.user_id;
+
+    const sql = `
+        SELECT 
+            COUNT(*) as total,
+            SUM(CASE WHEN stage = 'applied' THEN 1 ELSE 0 END) as applied,
+            SUM(CASE WHEN stage = 'interview' THEN 1 ELSE 0 END) as interview,
+            SUM(CASE WHEN stage = 'offer' THEN 1 ELSE 0 END) as offer,
+            SUM(CASE WHEN stage = 'rejected' THEN 1 ELSE 0 END) as rejected
+        FROM Applications 
+        WHERE user_id = ? AND is_deleted = FALSE
+    `;
+
+    pool.query(sql, [user_id], (err, rows) => {
+        if (err) return res.send(result.createResult(err, null));
+        
+        const summary = {
+            total: rows[0].total || 0,
+            applied: rows[0].applied || 0,
+            interview: rows[0].interview || 0,
+            offer: rows[0].offer || 0,
+            rejected: rows[0].rejected || 0
+        };
+
+        // Success rate calculation
+        const successRate = summary.total > 0 
+            ? Math.round((summary.offer / summary.total) * 100) 
+            : 0;
+
+        // This response perfectly matches Home.js: stats?.summary?.total, stats?.successRate, etc.
+        res.send(result.createResult(null, {
+            summary,
+            successRate,
+            lastUpdated: new Date().toISOString(),
+            message: summary.total === 0 
+                ? "Start your journey! Apply to your first job today." 
+                : "You're doing great! Keep tracking your applications here."
+        }));
+    });
+});
+
+
 module.exports = router;  
 
