@@ -11,7 +11,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { v4: uuidv4 } = require('uuid');
 
 // Initialize Gemini with your API Key
-const genAI = new GoogleGenerativeAI("AIzaSyABlYhSCXZDlV-SYkfmC_umyXA9oB-Xjxw");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 // --- API TO GENERATE JD TEXT ---
 router.post('/jobs/generate-description', authorizeUser, async (req, res) => {
