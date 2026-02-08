@@ -94,7 +94,7 @@ router.post('/jobs/:jobId/gemini-score', authorizeUser, async (req, res) => {
       
       // 3. PURE GEMINI CALL
       console.log('🤖 Calling Gemini 2.5 Flash...');
-      const genAI = new GoogleGenerativeAI('AIzaSyCQ0U1Ysp_rUDmicOD_Q6nYeVlZclLh95U');
+      const genAI = new GoogleGenerativeAI('AIzaSyABlYhSCXZDlV-SYkfmC_umyXA9oB-Xjxw');
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       
       const prompt = `Score candidate fit (0-100) for this job:
@@ -125,34 +125,47 @@ router.post('/jobs/:jobId/gemini-score', authorizeUser, async (req, res) => {
       console.log('✅ Score:', score, 'Explanation:', explanation);
       
       // 🔥 5. SAVE TO JobFitmentScores IMMEDIATELY
-      console.log('💾 SAVING TO JobFitmentScores...');
-      const scoreId = uuidv4();
-      
-      await pool.promise().query(`
-        INSERT INTO JobFitmentScores (id, user_id, job_id, keyword_score, semantic_score, fit_flag, explanation)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, [
-        scoreId, 
-        userId, 
-        jobId,
-        score,        // keyword_score
-        score,        // semantic_score  
-        score > 60 ? 1 : 0,  // fit_flag
-        explanation.substring(0, 500)  // Limit text length
-      ]);
-      
-      console.log('✅ SAVED TO DATABASE! ID:', scoreId);
-      
-      // 6. Response
-      const response = {
-        fitmentScore: score / 100,
-        keywordMatch: score,
-        explanation,
-        aiPowered: true,
-        rawGemini: text,
-        savedToDb: true,
-        scoreId
-      };
+// 🔥 5. UPSERT logic
+console.log('💾 UPSERTING TO JobFitmentScores...');
+
+// Define the ID here so it's available for the query and the final response
+const scoreId = uuidv4(); 
+
+const upsertSql = `
+  INSERT INTO JobFitmentScores (
+    id, user_id, job_id, keyword_score, semantic_score, fit_flag, explanation, created_at
+  )
+  VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+  ON DUPLICATE KEY UPDATE 
+    keyword_score = VALUES(keyword_score),
+    semantic_score = VALUES(semantic_score),
+    fit_flag = VALUES(fit_flag),
+    explanation = VALUES(explanation),
+    updated_at = NOW()
+`;
+
+await pool.promise().query(upsertSql, [
+  scoreId, // Now defined!
+  userId, 
+  jobId,
+  score,
+  score,
+  score > 60 ? 1 : 0,
+  explanation.substring(0, 500)
+]);
+
+console.log('✅ DB SYNCED (Inserted or Updated)!');
+
+// 6. Response
+const response = {
+  fitmentScore: score / 100,
+  keywordMatch: score,
+  explanation,
+  aiPowered: true,
+  rawGemini: text,
+  savedToDb: true,
+  scoreId // Now this will work perfectly!
+};    
       
       console.log('📤 Response:', response);
       console.log('🌟 === GEMINI + DB SUCCESS ===');
@@ -376,6 +389,7 @@ router.post('/profile', authorizeUser, (req, res) => {
 
 
 
+
 // GET Profile/Dashboard Data
 router.get('/me', authorizeUser, (req, res) => {
     const user_id = req.headers.user_id;  // From your middleware
@@ -404,44 +418,53 @@ router.get('/jobs', authorizeUser, (req, res) => {
     
     const offset = (page - 1) * limit;
     
-    let sql = `
+    // 1. Define the base SELECT and JOINs
+    let selectClause = `
         SELECT 
             j.job_id, j.title, j.location_type, j.employment_type,
             j.experience_min, j.experience_max, j.jd_text, j.status,
             o.name as organization_name, o.logo_url,
-            j.created_at
+            j.created_at,
+            jfs.semantic_score, jfs.explanation as ai_explanation
+    `;
+
+    let fromClause = `
         FROM Jobs j
         JOIN Organizations o ON j.org_id = o.organization_id
+        LEFT JOIN JobFitmentScores jfs ON j.job_id = jfs.job_id AND jfs.user_id = ?
         WHERE j.status = 'open' AND j.is_deleted = FALSE AND o.is_deleted = FALSE
     `;
     
-    const params = [];
-    
-    // Filters
+    const queryParams = [user_id]; // Start with user_id for the LEFT JOIN
+    let filterSql = "";
+
+    // 2. Add dynamic filters
     if (location_type) {
-        sql += ` AND j.location_type = ?`;
-        params.push(location_type);
+        filterSql += ` AND j.location_type = ?`;
+        queryParams.push(location_type);
     }
     if (employment_type) {
-        sql += ` AND j.employment_type = ?`;
-        params.push(employment_type);
+        filterSql += ` AND j.employment_type = ?`;
+        queryParams.push(employment_type);
     }
     if (skills) {
-        sql += ` AND (j.skills_required_json LIKE ? OR j.skills_preferred_json LIKE ?)`;
-        params.push(`%${skills}%`, `%${skills}%`);
+        filterSql += ` AND (j.skills_required_json LIKE ? OR j.skills_preferred_json LIKE ?)`;
+        queryParams.push(`%${skills}%`, `%${skills}%`);
     }
     
-    sql += ` ORDER BY j.created_at DESC LIMIT ? OFFSET ?`;
-    params.push(parseInt(limit), parseInt(offset));
-    
-    pool.query(sql, params, (err, jobs) => {
+    // 3. Main Data Query
+    const dataSql = `${selectClause} ${fromClause} ${filterSql} ORDER BY j.created_at DESC LIMIT ? OFFSET ?`;
+    const dataParams = [...queryParams, parseInt(limit), parseInt(offset)];
+
+    pool.query(dataSql, dataParams, (err, jobs) => {
         if (err) return res.send(result.createResult(err, null));
         
-        // Count total for pagination
-        const countSql = sql.replace('SELECT j.job_id, j.title...', 'SELECT COUNT(*) as total')
-                           .replace('ORDER BY j.created_at DESC LIMIT ? OFFSET ?', '');
+        // 4. Count Query (uses the same fromClause and filterSql but different SELECT)
+        const countSql = `SELECT COUNT(*) as total ${fromClause} ${filterSql}`;
         
-        pool.query(countSql, params.slice(0, -2), (err2, countResult) => {
+        pool.query(countSql, queryParams, (err2, countResult) => {
+            if (err2) return res.send(result.createResult(err2, null));
+
             res.send(result.createResult(null, {
                 jobs,
                 pagination: {
@@ -899,6 +922,95 @@ router.get('/fitment/:jobId', authorizeUser, (req, res) => {
     });
 });
 
+
+router.get('/stats/applications', authorizeUser, (req, res) => {
+    const user_id = req.headers.user_id;
+    
+    console.log('📊 === APPLICATION STATS ===', { user_id });
+    
+    // 1. Main stats query - counts + candidate details
+    const statsSql = `
+        SELECT 
+            -- Counts by stage
+            SUM(CASE WHEN a.stage = 'applied' THEN 1 ELSE 0 END) as applied_count,
+            SUM(CASE WHEN a.stage = 'shortlisted' THEN 1 ELSE 0 END) as shortlisted_count,
+            SUM(CASE WHEN a.stage = 'interview' THEN 1 ELSE 0 END) as interview_count,
+            SUM(CASE WHEN a.stage = 'offer' THEN 1 ELSE 0 END) as offer_count,
+            SUM(CASE WHEN a.stage = 'hired' THEN 1 ELSE 0 END) as hired_count,
+            SUM(CASE WHEN a.stage = 'rejected' THEN 1 ELSE 0 END) as rejected_count,
+            
+            -- Total applications
+            COUNT(*) as total_applications,
+            
+            -- Recent applications with candidate details (last 10)
+            JSON_ARRAYAGG(
+                JSON_OBJECT(
+                    'application_id', a.application_id,
+                    'job_title', j.title,
+                    'organization', o.name,
+                    'stage', a.stage,
+                    'candidate_name', COALESCE(cp.name, u.email),
+                    'profile_photo', u.profile_photo_url,
+                    'created_at', a.created_at,
+                    'fit_score', jfs.semantic_score
+                )
+            ) as recent_applications
+            
+        FROM Applications a
+        JOIN Jobs j ON a.job_id = j.job_id AND j.is_deleted = FALSE
+        JOIN Organizations o ON j.org_id = o.organization_id AND o.is_deleted = FALSE
+        LEFT JOIN CandidateProfiles cp ON a.user_id = cp.user_id AND cp.is_deleted = FALSE
+        LEFT JOIN Users u ON a.user_id = u.user_id AND u.is_deleted = FALSE
+        LEFT JOIN JobFitmentScores jfs ON a.user_id = jfs.user_id AND a.job_id = jfs.job_id AND jfs.is_deleted = FALSE
+        
+        WHERE a.user_id = ? AND a.is_deleted = FALSE
+    `;
+    
+    pool.query(statsSql, [user_id], (err, statsResult) => {
+        if (err) {
+            console.error('💥 Stats query error:', err);
+            return res.send(result.createResult(err, null));
+        }
+        
+        const stats = statsResult[0] || {};
+        
+        // Parse recent applications safely
+        let recentApps = [];
+        try {
+            if (stats.recent_applications) {
+                recentApps = JSON.parse(stats.recent_applications);
+            }
+        } catch (e) {
+            console.log('⚠️ Recent apps JSON parse failed:', e.message);
+        }
+        
+        // 2. Stage progression summary
+        const stageSummary = {
+            applied: parseInt(stats.applied_count || 0),
+            shortlisted: parseInt(stats.shortlisted_count || 0),
+            interview: parseInt(stats.interview_count || 0),
+            offer: parseInt(stats.offer_count || 0),
+            hired: parseInt(stats.hired_count || 0),
+            rejected: parseInt(stats.rejected_count || 0),
+            total: parseInt(stats.total_applications || 0)
+        };
+        
+        // 3. Success rate
+        const successRate = stageSummary.total > 0 
+            ? ((stageSummary.hired + stageSummary.offer) / stageSummary.total * 100).toFixed(1)
+            : 0;
+        
+        console.log('📊 Stats:', stageSummary, 'Success:', successRate + '%');
+        
+        res.send(result.createResult(null, {
+            summary: stageSummary,
+            successRate: parseFloat(successRate),
+            recentApplications: recentApps.slice(0, 10), // Limit to 10
+            lastUpdated: new Date().toISOString(),
+            message: `Found ${stageSummary.total} total applications`
+        }));
+    });
+});
 
 module.exports = router;  
 

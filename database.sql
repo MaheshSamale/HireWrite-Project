@@ -184,3 +184,20 @@ CREATE INDEX idx_applications_user_id ON Applications(user_id);
 CREATE INDEX idx_applications_stage ON Applications(stage);
 CREATE INDEX idx_orgusers_user_id ON OrgUsers(user_id);
 CREATE INDEX idx_orgusers_org_id ON OrgUsers(organization_id);
+
+
+ALTER TABLE JobFitmentScores ADD UNIQUE INDEX unique_user_job (user_id, job_id);
+
+
+
+DELETE FROM JobFitmentScores 
+WHERE id NOT IN (
+    SELECT id FROM (
+        SELECT id FROM JobFitmentScores t1
+        INNER JOIN (
+            SELECT user_id as uid, job_id as jid, MAX(created_at) as max_date
+            FROM JobFitmentScores
+            GROUP BY user_id, job_id
+        ) t2 ON t1.user_id = t2.uid AND t1.job_id = t2.jid AND t1.created_at = t2.max_date
+    ) as temp
+);
