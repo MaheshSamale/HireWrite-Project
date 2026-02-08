@@ -132,32 +132,48 @@ const upload = multer({
 
 
 
-// POST /api/users/profile-photo
+// Ensure 'photo' matches the frontend key
 router.post('/profile-photo', authorizeUser, upload.single('photo'), (req, res) => {
-    const user_id = req.headers.user_id;
+    // 1. Check if authorizeUser middleware correctly attached user_id
+    // If not, use req.headers.user_id as a fallback
+    const user_id = req.user?.user_id || req.headers.user_id;
     
     if (!user_id) {
-        return res.send(result.createResult('User ID missing from token', null));
-    }
-    if (!req.file) {
-        return res.send(result.createResult('Profile photo is required', null));
+        return res.status(400).json({ status: 'error', message: 'User ID missing' });
     }
 
-    // URL or relative path you want to store in DB
+    // 2. Check if Multer actually saved the file
+    if (!req.file) {
+        return res.status(400).json({ status: 'error', message: 'No file uploaded or invalid file type' });
+    }
+
+    // 3. Construct the URL
     const photoUrl = `/uploads/profiles/${req.file.filename}`;
 
+    // 4. Update Database
     const sql = `UPDATE Users 
                  SET profile_photo_url = ?, updated_at = NOW() 
                  WHERE user_id = ? AND is_deleted = FALSE`;
 
-    pool.query(sql, [photoUrl, user_id], (err, data) => {
-        if (err) return res.send(result.createResult(err, null));
+    pool.query(sql, [photoUrl, user_id], (err, resultData) => {
+        if (err) {
+            console.error("Database Error:", err);
+            return res.status(500).json({ status: 'error', message: 'Database update failed' });
+        }
 
-        res.send(result.createResult(null, {
-            user_id,
-            profile_photo_url: photoUrl,
-            message: 'Profile photo updated successfully'
-        }));
+        if (resultData.affectedRows === 0) {
+            return res.status(404).json({ status: 'error', message: 'User not found or already deleted' });
+        }
+
+        // 5. Success response
+        res.status(200).json({
+            status: 'success',
+            data: {
+                user_id,
+                profile_photo_url: photoUrl,
+                message: 'Profile photo updated successfully'
+            }
+        });
     });
 });
 
