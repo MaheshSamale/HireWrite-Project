@@ -141,14 +141,14 @@ const upsertSql = `
 `;
 
 await pool.promise().query(upsertSql, [
-  scoreId, // Now defined!
-  userId, 
-  jobId,
-  score,
-  score,
-  score > 60 ? 1 : 0,
-  explanation.substring(0, 500)
-]);
+    uuidv4(), 
+    userId, 
+    jobId,
+    score,
+    score,
+    score > 60 ? 1 : 0,
+    explanation.substring(0, 500)
+  ]);
 
 console.log('✅ DB SYNCED (Inserted or Updated)!');
 
