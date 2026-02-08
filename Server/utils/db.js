@@ -39,21 +39,7 @@
 
 
 
-// const mysql = require('mysql2/promise'); // Must be /promise
-
-// const pool = mysql.createPool({
-//     host: 'localhost',
-//     user: 'root',
-//     password: 'Rutuja0802@',
-//     database: 'hirewrite_database'
-// })
-
-// module.exports = pool;
-
-
-
-// Server/utils/db.js
-const mysql = require('mysql2'); // Remove the '/promise' part
+const mysql = require('mysql2'); // Must be /promise
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST ,
