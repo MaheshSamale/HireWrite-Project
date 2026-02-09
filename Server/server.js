@@ -26,7 +26,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.use(authorizeUser); 
+
 
 app.get('/', (req, res) => res.send('Hello from server'));
 
@@ -57,6 +57,7 @@ console.log('hi')
 
 // 4. Routes (Remember the prefix is /api/...)
 app.use('/api/users', userRouter);
+app.use(authorizeUser); 
 app.use('/api/candidates', candidateRouter);
 app.use('/api/organizations', orgRouter);
 app.use('/api/recruiters', recruiterRouter);
