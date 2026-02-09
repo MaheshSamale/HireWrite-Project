@@ -1,6 +1,6 @@
 
 // Server/utils/db.js
-const mysql = require('mysql2'); // Remove the '/promise' part
+// const mysql = require('mysql2'); // Remove the '/promise' part
 
 // // Server/utils/db.js
 // const mysql = require('mysql2/promise');
@@ -44,7 +44,7 @@ const mysql = require('mysql2'); // Remove the '/promise' part
 
 
 const mysql = require('mysql2'); // Must be /promise
->>>>>>> c53206c (App file)
+
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST ,
