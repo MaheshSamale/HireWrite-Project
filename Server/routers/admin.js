@@ -131,7 +131,7 @@ router.get('/dashboard', authorizeUser, (req, res) => {
     }
 
     const sql = `
-        SELECT 'users' AS type, COUNT(*) AS total FROM Users WHERE is_deleted = FALSE
+        SELECT 'users' AS type, COUNT(*) AS total FROM Users WHERE role != "admin" is_deleted = FALSE
         UNION ALL
         SELECT 'organizations', COUNT(*) FROM Organizations WHERE is_deleted = FALSE
         UNION ALL
