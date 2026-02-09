@@ -17,6 +17,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // 2. Static files (images) should be accessible WITHOUT authorization
 app.use('/uploads/profiles', express.static(path.join(__dirname, 'uploads', 'profiles')));
 app.use('/uploads/resumes', express.static(path.join(__dirname, 'uploads', 'resumes')));
