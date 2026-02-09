@@ -5,6 +5,12 @@ const config = require('../utils/config');
 function authorizeUser(req, res, next) {
     const url = req.url;
     console.log(url)
+
+    if (url.startsWith('/uploads/') || url.includes('/uploads/')) {
+        console.log("Public File Access:", url);
+        return next();
+    }
+    
     // Public routes (add candidates too)
     if (url.includes('/api/candidates/register') || 
         url.includes('/api/candidates/login') || 
