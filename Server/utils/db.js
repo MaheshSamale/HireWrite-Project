@@ -1,7 +1,7 @@
-<<<<<<< HEAD
+
 // Server/utils/db.js
 const mysql = require('mysql2'); // Remove the '/promise' part
-=======
+
 // // Server/utils/db.js
 // const mysql = require('mysql2/promise');
 // const fs = require('fs');
