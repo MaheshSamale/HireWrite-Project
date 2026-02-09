@@ -105,7 +105,7 @@ function Navbar({ isOpen, toggleSidebar }) {
         <div className="user-card">
           {admin?.profile_photo_url ? (
             <img 
-              src={"http://localhost:4000" + admin.profile_photo_url} 
+              src={"https://hirewrite-project.onrender.com" + admin.profile_photo_url} 
               alt="Admin" 
               className="user-avatar" 
             />
