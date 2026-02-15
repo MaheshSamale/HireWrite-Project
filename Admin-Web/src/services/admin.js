@@ -84,25 +84,31 @@ export async function fetchProfile() {
 
 export async function updateProfilePhoto(file) {
     const url = config.BASE_URL + '/users/profile-photo';
-    
-    // Create FormData object and append the file
-    const formData = new FormData();
-    formData.append('profile_photo', file);
+    const token = window.sessionStorage.getItem('token');
 
-    const headers = {
-        'token': window.sessionStorage.getItem('token'),
-        'Content-Type': 'multipart/form-data'
-    };
+    if (!token) {
+        throw new Error("Login session expired. Please sign in again.");
+    }
+
+    // Create FormData object
+    const formData = new FormData();
+    // Ensure 'photo' matches the upload.single('photo') in your backend
+    formData.append('photo', file); 
 
     try {
-        const response = await axios.patch(url, formData, { headers });
-        toast.success(response.data.data.message);
+        const response = await axios.post(url, formData, {
+            headers: {
+                // Keep your token headers
+                'token': token, 
+                'Authorization': `Bearer ${token}`,
+                // IMPORTANT: Let the browser set the Content-Type with the boundary
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data;
     } catch (error) {
-        // Checking for axios-specific error message structure
-        const errorMessage = error.response?.data?.message || error.message;
-        toast.error(errorMessage);
-        throw error; 
+        console.error("Upload Error:", error.response?.data);
+        throw new Error(error.response?.data?.message || "Upload failed");
     }
 }
 

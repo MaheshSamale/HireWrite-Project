@@ -40,36 +40,37 @@ const Settings = () => {
     }
   }
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      toast.warning('Please select an image first')
-      return
-    }
+  // ... imports FaCamera, etc.
 
-    const formData = new FormData()
-    formData.append('profile_photo', selectedFile)
-
-    setLoading(true)
-    try {
-      const result = await updateProfilePhoto(formData)
-
-      if (result.status === 'success') {
-        toast.success(result.data.message)
-        // Update local admin state with new URL from server
-        setAdmin(prev => ({
-          ...prev,
-          profile_photo_url: result.data.profile_photo_url
-        }))
-        setSelectedFile(null) // Reset selection
-      } else {
-        toast.error('Upload failed')
-      }
-    } catch (err) {
-      toast.error('Something went wrong')
-    } finally {
-      setLoading(false)
-    }
+const handleUpload = async () => {
+  if (!selectedFile) {
+    toast.warning('Please select an image first');
+    return;
   }
+
+  setLoading(true);
+  try {
+    // Call service with raw file
+    const result = await updateProfilePhoto(selectedFile);
+
+    if (result.status === 'success') {
+      toast.success('Profile photo updated!');
+      
+      // Update the local state so UI updates immediately
+      setAdmin(prev => ({
+        ...prev,
+        profile_photo_url: result.data.profile_photo_url
+      }));
+
+      setSelectedFile(null);
+      setPreviewUrl(null);
+    }
+  } catch (err) {
+    toast.error(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Helper to determine which image to show (Preview > Server URL > Placeholder)
   const displayImage = () => {

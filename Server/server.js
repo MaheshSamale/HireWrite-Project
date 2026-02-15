@@ -17,6 +17,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // 2. Static files (images) should be accessible WITHOUT authorization
 app.use('/uploads/profiles', express.static(path.join(__dirname, 'uploads', 'profiles')));
 app.use('/uploads/resumes', express.static(path.join(__dirname, 'uploads', 'resumes')));
@@ -26,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.use(authorizeUser); 
+
 
 app.get('/', (req, res) => res.send('Hello from server'));
 
@@ -57,6 +59,7 @@ console.log('hi')
 
 // 4. Routes (Remember the prefix is /api/...)
 app.use('/api/users', userRouter);
+app.use(authorizeUser); 
 app.use('/api/candidates', candidateRouter);
 app.use('/api/organizations', orgRouter);
 app.use('/api/recruiters', recruiterRouter);

@@ -131,7 +131,7 @@ router.get('/dashboard', authorizeUser, (req, res) => {
     }
 
     const sql = `
-        SELECT 'users' AS type, COUNT(*) AS total FROM Users WHERE is_deleted = FALSE
+        SELECT 'users' AS type, COUNT(*) AS total FROM Users WHERE role != "admin"  AND is_deleted = FALSE
         UNION ALL
         SELECT 'organizations', COUNT(*) FROM Organizations WHERE is_deleted = FALSE
         UNION ALL
@@ -201,7 +201,7 @@ router.get('/users', authorizeUser, (req, res) => {
             COALESCE(cp.name, ou.name, '') as name
         FROM Users u
         LEFT JOIN CandidateProfiles cp ON u.user_id = cp.user_id AND cp.is_deleted = 0
-        LEFT JOIN orgUsers ou ON u.user_id = ou.user_id AND ou.is_deleted = 0
+        LEFT JOIN OrgUsers ou ON u.user_id = ou.user_id AND ou.is_deleted = 0
         WHERE u.role != 'admin' AND u.is_deleted = 0
     `;
     const params = [];
@@ -242,7 +242,7 @@ router.get('/blockedUsers', authorizeUser, (req, res) => {
             COALESCE(cp.name, ou.name, '') as name
         FROM Users u
         LEFT JOIN CandidateProfiles cp ON u.user_id = cp.user_id AND cp.is_deleted = 0 
-        LEFT JOIN orgUsers ou ON u.user_id = ou.user_id AND ou.is_deleted = 0 
+        LEFT JOIN OrgUsers ou ON u.user_id = ou.user_id AND ou.is_deleted = 0 
         WHERE u.role != 'admin' AND u.is_deleted = 1
     `;
     const params = [];
