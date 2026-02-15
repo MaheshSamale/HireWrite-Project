@@ -1,87 +1,107 @@
-Yethe tumchya project sathi updated `README.md` dile aahe, jyamadhe sarva contributors ani tech stack chi mahiti samavishta aahe:
-
----
-
 # HireWrite: AI-Powered Recruitment Ecosystem
 
-**HireWrite** he ek pudhchya pidhiche recruitment platform aahe, je paramparik applicant tracking ani modern Artificial Intelligence yanchyatil antar kami karte. **Google Gemini AI** cha vapar karun, HireWrite fakt keyword matching chya pudhe jaun semantic analysis, automated job descriptions ani objective candidate scoring pradan karte.
+**HireWrite** is a next-generation recruitment platform designed to bridge the gap between traditional applicant tracking and modern Artificial Intelligence. By leveraging **Google Gemini AI**, HireWrite moves beyond simple keyword matching to provide semantic analysis, automated job descriptions, and objective candidate scoring.
 
 ---
 
-## Key Features
+## 🌟 Key Features
 
-* ** AI-Powered Scoring:** Gemini AI cha vapar karun candidate resume ani Job Description yanchyatil "Fitment Score" calculate karte.
-* ** Smart JD Generation:** Recruiters kahi sekandat AI chya madatine high-impact job descriptions tayar karu shaktat.
-* ** Multi-Tenant Architecture:** Candidates, Recruiters, Organizations, ani Super Admins sathi swatantra workflow.
-* ** Dynamic Dashboards:** Application tracking, hiring pipelines, ani user management sathi real-time statistics.
-* ** Resume Management:** Candidate profiles sathi surakshit PDF/Docx upload ani storage.
-
----
-
-## Tech Stack
-
-* **Frontend (Mobile & Web):** React Native (React Navigation, Axios, AsyncStorage) & React.js
-* **Backend:** Node.js, Express.js (35+ REST APIs)
-* **Database:** MySQL
-* **AI Engine:** Google Gemini AI (Generative AI SDK)
-* **Authentication:** JWT (JSON Web Tokens) & Bcrypt
+* **🤖 AI-Powered Scoring:** Automatically calculates a "Fitment Score" between candidate resumes and Job Descriptions using Gemini AI.
+* **✍️ Smart JD Generation:** Recruiters can generate high-impact job descriptions in seconds via AI integration.
+* **🏢 Multi-Tenant Architecture:** Dedicated workflows for Candidates, Recruiters, Organizations, and Super Admins.
+* **📊 Dynamic Dashboards:** Real-time statistics for application tracking, hiring pipelines, and user management.
+* **📎 Resume Management:** Secure PDF/Docx upload and storage for candidate profiles.
 
 ---
 
-## Live Demo
+## 🛠️ Tech Stack
+
+| Layer | Technologies Used |
+| --- | --- |
+| **Frontend** | React Native (React Navigation, Axios, AsyncStorage), React.js |
+| **Backend** | Node.js, Express.js (35+ REST APIs) |
+| **Database** | MySQL |
+| **AI Engine** | Google Gemini AI (Generative AI SDK) |
+| **Auth** | JWT (JSON Web Tokens) & Bcrypt |
+
+---
+
+## 🌐 Live Demo
 
 Experience the platform live:
 
-* **Web Dashboard:** [https://hire-write-project-ci5c.vercel.app/](https://hire-write-project-ci5c.vercel.app/)
+* **Web Dashboard:** [HireWrite Vercel App](https://hire-write-project-ci5c.vercel.app/)
 * **Demo Credentials:** * **Email:** `m@123`
 * **Password:** `123`
-*(Tip: Demo credentials veloveli reset kele jatat)*
+*(Note: Demo credentials reset periodically)*
 
 
 
 ---
 
-## Complete API Reference
+## 📡 Complete API Reference
 
 ### **1. Admin Module** (`/api/admin`)
 
-* `POST /register` – Navin admin nondani.
+* `POST /register` – Register a new system administrator.
 * `POST /login` – Admin authentication.
-* `GET /dashboard` – System-wide stats (Users, Orgs, Jobs, Apps).
-* `GET /users` – Sarva active candidates ani recruiters chi yadi.
-* `POST /blockUser` / `POST /unblockUser` – User access management.
-* `GET /audit` – Admin actions che logs.
+* `GET /dashboard` – High-level stats (Total Users, Orgs, Jobs, Apps).
+* `GET /profile` – Get current admin profile details.
+* `GET /users` – List all active candidates and recruiters.
+* `GET /blockedUsers` – View list of soft-deleted/restricted users.
+* `POST /blockUser` – Restrict access for a specific user.
+* `POST /unblockUser` – Restore access for a blocked user.
+* `GET /organizations` – List all registered companies.
+* `GET /jobs` – Global job listing with stage filters.
+* `GET /audit` – View logs of administrative actions.
 
 ### **2. Candidate Module** (`/api/candidates`)
 
-* `POST /profile` – Professional details set up karne.
-* `GET /jobs/explore` – AI-ready job listings pahane.
-* `POST /jobs/:jobId/apply` – Job sathi application dene.
-* `POST /resumes` – PDF/Docx upload karne.
-* `POST /jobs/:jobId/gemini-score` – **AI Feature:** Fitment Analysis.
+* `POST /register` – Create a new candidate account.
+* `POST /login` – Candidate authentication.
+* `POST /profile` – Create or update professional details.
+* `GET /profile` – Retrieve personal professional profile.
+* `GET /jobs/explore` – Browse and search for open job listings.
+* `GET /jobs/:jobId` – Get full details for a specific job post.
+* `POST /jobs/:jobId/apply` – Submit an application for a role.
+* `GET /applications` – Track status of all personal applications.
+* `POST /resumes` – Upload resume files (PDF/Docx).
+* `GET /resumes` – List all uploaded resumes for the user.
+* `POST /jobs/:jobId/gemini-score` – **AI Feature:** Calculate match score against JD.
+* `GET /stats` – Personal application success/stage metrics.
 
 ### **3. Recruiter Module** (`/api/recruiters`)
 
-* `POST /jobs/generate-description` – **AI Feature:** AI JD Writer.
-* `POST /jobs` – Navin job post karne.
-* `PUT /applications/:applicationId/stage` – Pipeline management (Interview/Offer).
+* `POST /jobs/generate-description` – **AI Feature:** Generate JDs using Gemini.
+* `POST /jobs` – Create and publish a new job opening.
+* `PUT /jobs/status` – Toggle job status (Open/Closed).
+* `GET /jobs` – List all jobs managed by the recruiter.
+* `GET /jobs/:jobId/applications` – View all candidates for a specific job.
+* `PUT /applications/:applicationId/stage` – Move candidates through the pipeline.
+* `GET /profile` – Get recruiter and organization summary.
 
 ### **4. Organization Module** (`/api/organizations`)
 
-* `POST /register` – Navin sansthechi nondani.
-* `POST /recruiters` – Hiring teams manage karne.
+* `POST /register` – Register a new organization entity.
+* `POST /login` – Organization-level management login.
+* `POST /recruiters` – Add new recruiter accounts to the organization.
+* `POST /recruiters/login` – Specialized login for recruiter access.
+* `GET /recruiters` – List all recruiters associated with the organization.
+* `GET /jobs` – View all jobs posted under the organization banner.
+* `GET /jobs/:jobId` – Detailed analytics for a specific organizational job.
+
+### **5. User Module** (`/api/users`)
+
+* `POST /profile-photo` – Upload and update user profile pictures.
 
 ---
 
-## Contributors
+## 👥 Contributors
 
-* **Mahesh Samale** (@MaheshSamale)
-* **Rutuja Jadhav** (@Rutuja-coder08)
-* **Shikha Kashyap** (@shikha-kashyap)
-* **Vijay Shinde** (@Vijay-shinde96)
+We are a team of dedicated developers focused on modernizing the recruitment landscape.
 
----
+* **Mahesh Samale** – [GitHub Profile](https://www.google.com/search?q=https://github.com/MaheshSamale)
+* **Rutuja Jadhav** – [GitHub Profile](https://github.com/Rutuja-coder08)
+* **Shikha Kashyap** – [GitHub Profile](https://github.com/shikha-kashyap)
+* **Vijay Shinde** – [GitHub Profile](https://github.com/Vijay-shinde96)
 
-**Source Code & APKs:** [GitHub Repo]
-
----
